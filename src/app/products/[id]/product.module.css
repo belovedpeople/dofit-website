@@ -77,26 +77,34 @@
 .mainImageWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 4 / 5;
-  background: var(--black-card);
-  border-radius: 6px;
+  height: 540px;
+  max-height: 72vh;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0.7) 100%), #0a0a0f;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--white-08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .asaTheme .mainImageWrap {
-  background: var(--asa-card);
-  border-color: rgba(232, 160, 32, 0.2);
+  background: radial-gradient(circle at center, rgba(232, 160, 32, 0.08) 0%, rgba(10, 8, 15, 0.95) 100%), #0d0a14;
+  border-color: rgba(232, 160, 32, 0.25);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
 
 .mainImage {
-  object-fit: cover;
-  transition: transform 0.6s var(--ease-out);
+  object-fit: contain !important;
+  width: 100% !important;
+  height: 100% !important;
+  transition: transform 0.3s ease;
 }
 
-.mainImageWrap:hover .mainImage {
-  transform: scale(1.05);
+@media (hover: hover) and (pointer: fine) {
+  .mainImageWrap:hover .mainImage {
+    transform: scale(1.03);
+  }
 }
 
 .tagBadge {
@@ -160,8 +168,9 @@
 .mainVideo {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  border-radius: 6px;
+  object-fit: contain;
+  background: #000;
+  border-radius: 12px;
 }
 
 .videoThumbWrapper {
@@ -869,18 +878,18 @@
   }
 
   .main {
-    padding-top: 74px;
-    padding-bottom: 40px;
+    padding-top: 104px;
+    padding-bottom: 50px;
   }
 
   .breadcrumbs {
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     font-size: 12px;
   }
 
   .productGrid {
     grid-template-columns: 1fr;
-    gap: 20px;
+    gap: 18px;
   }
 
   .gallery {
@@ -889,7 +898,9 @@
 
   .mainImageWrap {
     border-radius: 12px;
-    aspect-ratio: 4 / 5;
+    width: 100%;
+    height: 420px;
+    max-height: 56vh;
   }
 
   .thumbnailRow {
