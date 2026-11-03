@@ -56,23 +56,25 @@ export default function MediaUploader({
       setUploadProgress(80);
       const data = await res.json();
 
-      if (data.urls) {
-        const newFiles: MediaFile[] = data.urls.map((url: string, i: number) => {
-          const original = fileArray[i];
-          return {
-            url,
-            type: original.type.startsWith('video') ? 'video' : 'image',
-            name: original.name,
-          };
-        });
-        const updated = [...mediaFiles, ...newFiles];
-        setMediaFiles(updated);
-        emitChange(updated);
+      if (!res.ok || !data.urls) {
+        throw new Error(data.error || 'Upload failed. Please check your credentials.');
       }
+
+      const newFiles: MediaFile[] = data.urls.map((url: string, i: number) => {
+        const original = fileArray[i];
+        return {
+          url,
+          type: original.type.startsWith('video') ? 'video' : 'image',
+          name: original.name,
+        };
+      });
+      const updated = [...mediaFiles, ...newFiles];
+      setMediaFiles(updated);
+      emitChange(updated);
       setUploadProgress(100);
     } catch (err) {
       console.error('Upload failed:', err);
-      alert('Upload failed. Please try again.');
+      alert(err instanceof Error ? err.message : 'Upload failed. Please try again.');
     } finally {
       setTimeout(() => {
         setUploading(false);
