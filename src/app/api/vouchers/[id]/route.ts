@@ -58,3 +58,4 @@ export async function DELETE(
   const ok = deleteVoucher(id);
   return NextResponse.json({ success: ok });
 }
+

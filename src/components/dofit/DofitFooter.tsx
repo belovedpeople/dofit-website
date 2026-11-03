@@ -53,7 +53,7 @@ export default function DofitFooter() {
           <Link href="/shop" className={styles.colLink} id="footer-all-drops">All Collections</Link>
           <Link href="/shop?brand=dofit" className={styles.colLink} id="footer-new-drops">New Arrivals</Link>
           <Link href="/asa" className={`${styles.colLink} ${styles.asaLink}`} id="footer-asa">
-            <span className="asa-display" style={{fontStyle:'italic'}}>Àṣà by Dofit</span>
+            <span className="asa-display" style={{ fontStyle: 'italic' }}>Àṣà by Dofit</span>
           </Link>
         </div>
 

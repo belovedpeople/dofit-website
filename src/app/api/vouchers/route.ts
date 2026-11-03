@@ -83,3 +83,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to create voucher' }, { status: 500 });
   }
 }
+

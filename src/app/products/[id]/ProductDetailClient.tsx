@@ -33,12 +33,101 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
   const [activeTab, setActiveTab] = useState<'features' | 'fabric' | 'shipping'>('features');
   const [addedAnimation, setAddedAnimation] = useState(false);
 
+  // Fullscreen Lightbox & Zoom Viewer state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+
   useEffect(() => {
     if (product) {
       if (product.sizes?.[0]) setSelectedSize(product.sizes[0]);
       if (product.colors?.[0]?.name) setSelectedColor(product.colors[0].name);
     }
   }, [product]);
+
+  // Lock body scroll when lightbox is active
+  useEffect(() => {
+    if (lightboxOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+      setZoomLevel(1);
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [lightboxOpen]);
+
+  // Unified list of images and videos: VIDEOS FIRST as requested!
+  const mediaList: Array<{ type: 'image' | 'video'; url: string }> = [
+    ...(product?.videos || []).map((url) => ({ type: 'video' as const, url })),
+    ...(product?.images || []).map((url) => ({ type: 'image' as const, url })),
+  ];
+
+  // Keyboard navigation for Lightbox
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxOpen(false);
+      if (e.key === 'ArrowRight') {
+        setZoomLevel(1);
+        setLightboxIndex((prev) => (prev + 1) % (mediaList.length || 1));
+      }
+      if (e.key === 'ArrowLeft') {
+        setZoomLevel(1);
+        setLightboxIndex((prev) => (prev - 1 + (mediaList.length || 1)) % (mediaList.length || 1));
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [lightboxOpen, mediaList.length]);
+
+  const handleOpenLightbox = (index: number) => {
+    setLightboxIndex(index);
+    setZoomLevel(1);
+    setLightboxOpen(true);
+  };
+
+  const handleLightboxNext = () => {
+    setZoomLevel(1);
+    setLightboxIndex((prev) => (prev + 1) % (mediaList.length || 1));
+  };
+
+  const handleLightboxPrev = () => {
+    setZoomLevel(1);
+    setLightboxIndex((prev) => (prev - 1 + (mediaList.length || 1)) % (mediaList.length || 1));
+  };
+
+  const handleZoomIn = () => {
+    setZoomLevel((prev) => Math.min(Number((prev + 0.5).toFixed(1)), 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel((prev) => Math.max(Number((prev - 0.5).toFixed(1)), 1));
+  };
+
+  const handleToggleZoom = () => {
+    setZoomLevel((prev) => (prev > 1 ? 1 : 2));
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (zoomLevel === 1) {
+      setTouchStartX(e.touches[0].clientX);
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null || zoomLevel > 1) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (diff > 50) {
+      handleLightboxNext();
+    } else if (diff < -50) {
+      handleLightboxPrev();
+    }
+    setTouchStartX(null);
+  };
 
   if (!product && !productsLoading) {
     notFound();
@@ -54,12 +143,6 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
 
   const isAsa = product.brand === 'asa';
   const isOutOfStock = !product.inStock || product.stockCount === 0;
-
-  // Unified list of images and videos
-  const mediaList: Array<{ type: 'image' | 'video'; url: string }> = [
-    ...(product.images || []).map((url) => ({ type: 'image' as const, url })),
-    ...(product.videos || []).map((url) => ({ type: 'video' as const, url })),
-  ];
 
   const currentMedia = mediaList[selectedMediaIndex] || mediaList[0] || { type: 'image', url: '/images/dofit-wears/2-Piece Biker Short Set.png' };
 
@@ -98,7 +181,15 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
           {/* Left: Gallery (Photos + Videos) */}
           <div className={styles.gallery}>
             {/* Main Stage */}
-            <div className={styles.mainImageWrap}>
+            <div
+              className={styles.mainImageWrap}
+              onClick={() => {
+                if (currentMedia.type === 'image') {
+                  handleOpenLightbox(selectedMediaIndex);
+                }
+              }}
+              style={{ cursor: currentMedia.type === 'image' ? 'zoom-in' : 'default' }}
+            >
               {currentMedia.type === 'video' ? (
                 <video
                   key={currentMedia.url}
@@ -110,16 +201,29 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                   className={styles.mainVideo}
                 />
               ) : (
-                <Image
-                  key={currentMedia.url}
-                  src={currentMedia.url}
-                  alt={product.name}
-                  fill
-                  priority
-                  className={styles.mainImage}
-                  sizes="(max-width: 900px) 100vw, 50vw"
-                  unoptimized={currentMedia.url.startsWith('http')}
-                />
+                <>
+                  <Image
+                    key={currentMedia.url}
+                    src={currentMedia.url}
+                    alt={product.name}
+                    fill
+                    priority
+                    className={styles.mainImage}
+                    sizes="(max-width: 900px) 100vw, 50vw"
+                    unoptimized={currentMedia.url.startsWith('http')}
+                  />
+                  <button
+                    type="button"
+                    className={styles.zoomHintBtn}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenLightbox(selectedMediaIndex);
+                    }}
+                    aria-label="Zoom and view full image"
+                  >
+                    <span>🔍</span> Tap to expand &amp; zoom
+                  </button>
+                </>
               )}
               {product.tag && (
                 <span className={`${styles.tagBadge} ${isAsa ? styles.tagAsa : styles.tagDofit}`}>
@@ -454,6 +558,162 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
               Got It
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Fullscreen Lightbox & Zoom Mode */}
+      {lightboxOpen && (
+        <div
+          className={styles.lightboxOverlay}
+          onClick={() => setLightboxOpen(false)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Top Bar: Counter, Zoom Actions & Close */}
+          <div className={styles.lightboxTopBar} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.lightboxCounter}>
+              {lightboxIndex + 1} / {mediaList.length}
+            </div>
+
+            <div className={styles.lightboxZoomControls}>
+              {mediaList[lightboxIndex]?.type === 'image' && (
+                <>
+                  <button
+                    type="button"
+                    className={styles.lightboxIconBtn}
+                    onClick={handleZoomOut}
+                    disabled={zoomLevel <= 1}
+                    title="Zoom Out"
+                    aria-label="Zoom Out"
+                  >
+                    −
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.lightboxZoomLevelBadge}
+                    onClick={handleToggleZoom}
+                    title="Toggle 1x/2x Zoom"
+                  >
+                    {Math.round(zoomLevel * 100)}%
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.lightboxIconBtn}
+                    onClick={handleZoomIn}
+                    disabled={zoomLevel >= 3}
+                    title="Zoom In"
+                    aria-label="Zoom In"
+                  >
+                    +
+                  </button>
+                </>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className={styles.lightboxCloseBtn}
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close View Mode"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Center Viewport with Left/Right Arrows */}
+          <div className={styles.lightboxCenter} onClick={(e) => e.stopPropagation()}>
+            {/* Prev Arrow */}
+            {mediaList.length > 1 && (
+              <button
+                type="button"
+                className={`${styles.lightboxNavArrow} ${styles.lightboxPrev}`}
+                onClick={handleLightboxPrev}
+                aria-label="Previous media slide"
+              >
+                ‹
+              </button>
+            )}
+
+            {/* Media Canvas */}
+            <div
+              className={styles.lightboxMediaViewport}
+              onDoubleClick={handleToggleZoom}
+            >
+              {mediaList[lightboxIndex]?.type === 'video' ? (
+                <video
+                  key={mediaList[lightboxIndex].url}
+                  src={mediaList[lightboxIndex].url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className={styles.lightboxVideo}
+                />
+              ) : (
+                <div
+                  className={styles.lightboxImageWrapper}
+                  style={{
+                    transform: `scale(${zoomLevel})`,
+                    transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    cursor: zoomLevel > 1 ? 'grab' : 'zoom-in',
+                  }}
+                >
+                  <Image
+                    src={mediaList[lightboxIndex]?.url || ''}
+                    alt={product.name}
+                    fill
+                    className={styles.lightboxImg}
+                    priority
+                    unoptimized={mediaList[lightboxIndex]?.url?.startsWith('http')}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Next Arrow */}
+            {mediaList.length > 1 && (
+              <button
+                type="button"
+                className={`${styles.lightboxNavArrow} ${styles.lightboxNext}`}
+                onClick={handleLightboxNext}
+                aria-label="Next media slide"
+              >
+                ›
+              </button>
+            )}
+          </div>
+
+          {/* Bottom Thumbnails Strip */}
+          {mediaList.length > 1 && (
+            <div className={styles.lightboxBottomBar} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.lightboxThumbsScroll}>
+                {mediaList.map((m, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`${styles.lightboxThumbBtn} ${lightboxIndex === i ? styles.lightboxThumbActive : ''}`}
+                    onClick={() => {
+                      setZoomLevel(1);
+                      setLightboxIndex(i);
+                    }}
+                    aria-label={`Jump to slide ${i + 1}`}
+                  >
+                    {m.type === 'video' ? (
+                      <span className={styles.lightboxThumbPlay}>▶ Video</span>
+                    ) : (
+                      <Image
+                        src={m.url}
+                        alt=""
+                        fill
+                        className={styles.lightboxThumbImg}
+                        sizes="60px"
+                        unoptimized={m.url.startsWith('http')}
+                      />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
