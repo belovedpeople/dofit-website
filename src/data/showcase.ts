@@ -90,3 +90,4 @@ export function updateShowcaseStore(newData: Partial<ShowcaseContent>): Showcase
   };
   return showcaseStore;
 }
+

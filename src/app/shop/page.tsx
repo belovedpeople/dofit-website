@@ -10,6 +10,8 @@ import DofitNavbar from '@/components/dofit/DofitNavbar';
 import DofitFooter from '@/components/dofit/DofitFooter';
 import styles from './shop.module.css';
 
+const AVAILABLE_SIZES = ['All', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'Free Size'];
+
 function ShopContent() {
   const searchParams = useSearchParams();
   const initialBrand = searchParams.get('brand');
@@ -21,9 +23,13 @@ function ShopContent() {
   );
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedSize, setSelectedSize] = useState('All');
+  const [priceRange, setPriceRange] = useState<'all' | 'under-40k' | '40k-60k' | 'above-60k'>('all');
+  const [inStockOnly, setInStockOnly] = useState(false);
   const [sortBy, setSortBy] = useState<'featured' | 'price-asc' | 'price-desc' | 'newest'>('featured');
   const [quickAddProduct, setQuickAddProduct] = useState<Product | null>(null);
   const [quickSize, setQuickSize] = useState<string>('');
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Categories list
   const categories = useMemo(() => {
@@ -34,7 +40,25 @@ function ShopContent() {
       }
     });
     return ['All', ...Array.from(set)];
-  }, [selectedBrand]);
+  }, [products, selectedBrand]);
+
+  // Active filters count
+  const activeFiltersCount =
+    (selectedBrand !== 'all' ? 1 : 0) +
+    (selectedCategory !== 'All' ? 1 : 0) +
+    (selectedSize !== 'All' ? 1 : 0) +
+    (priceRange !== 'all' ? 1 : 0) +
+    (inStockOnly ? 1 : 0) +
+    (searchQuery ? 1 : 0);
+
+  const resetAllFilters = () => {
+    setSelectedBrand('all');
+    setSelectedCategory('All');
+    setSelectedSize('All');
+    setPriceRange('all');
+    setInStockOnly(false);
+    setSearchQuery('');
+  };
 
   // Filtered and sorted products
   const filteredProducts = useMemo(() => {
@@ -48,6 +72,25 @@ function ShopContent() {
     // Category filter
     if (selectedCategory !== 'All') {
       list = list.filter((p) => p.category === selectedCategory);
+    }
+
+    // Size filter
+    if (selectedSize !== 'All') {
+      list = list.filter((p) => (p.sizes || []).includes(selectedSize));
+    }
+
+    // Price range
+    if (priceRange === 'under-40k') {
+      list = list.filter((p) => p.price < 40000);
+    } else if (priceRange === '40k-60k') {
+      list = list.filter((p) => p.price >= 40000 && p.price <= 60000);
+    } else if (priceRange === 'above-60k') {
+      list = list.filter((p) => p.price > 60000);
+    }
+
+    // In stock only
+    if (inStockOnly) {
+      list = list.filter((p) => p.inStock && p.stockCount > 0);
     }
 
     // Search query
@@ -71,7 +114,7 @@ function ShopContent() {
     }
 
     return list;
-  }, [selectedBrand, selectedCategory, searchQuery, sortBy]);
+  }, [products, selectedBrand, selectedCategory, selectedSize, priceRange, inStockOnly, searchQuery, sortBy]);
 
   const handleQuickAdd = (p: Product) => {
     setQuickAddProduct(p);
@@ -122,7 +165,7 @@ function ShopContent() {
                 }}
               >
                 <span className={styles.dofitDot} />
-                Dofit Activewear (7)
+                Dofit Activewear ({products.filter((p) => p.brand === 'dofit').length})
               </button>
               <button
                 type="button"
@@ -133,7 +176,18 @@ function ShopContent() {
                 }}
               >
                 <span className={styles.asaDot} />
-                Àṣà Cultural Capsule (9)
+                Àṣà Cultural Capsule ({products.filter((p) => p.brand === 'asa').length})
+              </button>
+            </div>
+
+            {/* Mobile Filter Button */}
+            <div>
+              <button
+                type="button"
+                className={styles.mobileFilterTrigger}
+                onClick={() => setDrawerOpen(true)}
+              >
+                ⚡ Filters &amp; Sizes {activeFiltersCount > 0 && `(${activeFiltersCount})`}
               </button>
             </div>
           </div>
@@ -183,7 +237,7 @@ function ShopContent() {
             </div>
           </div>
 
-          {/* Category Pills */}
+          {/* Category Pills (Desktop) */}
           <div className={styles.categoryPills}>
             {categories.map((cat) => (
               <button
@@ -207,11 +261,7 @@ function ShopContent() {
               <button
                 type="button"
                 className="btn btn-outline-pink"
-                onClick={() => {
-                  setSelectedBrand('all');
-                  setSelectedCategory('All');
-                  setSearchQuery('');
-                }}
+                onClick={resetAllFilters}
                 style={{ marginTop: '16px' }}
               >
                 Reset All Filters
@@ -221,58 +271,85 @@ function ShopContent() {
             <div className={styles.productsGrid}>
               {filteredProducts.map((p) => {
                 const isAsa = p.brand === 'asa';
+                const isOutOfStock = !p.inStock || p.stockCount === 0;
+
                 return (
                   <div key={p.id} className={`${styles.card} ${isAsa ? styles.cardAsa : styles.cardDofit}`}>
                     <Link href={`/products/${p.slug}`} className={styles.cardImgLink}>
                       <div className={styles.imgWrap}>
                         <Image
-                          src={p.images[0]}
+                          src={p.images[0] || '/images/dofit-wears/2-Piece Biker Short Set.png'}
                           alt={p.name}
                           fill
-                          className={styles.mainImg}
-                          sizes="(max-width: 768px) 50vw, 33vw"
+                          className={styles.img}
+                          sizes="(max-width: 540px) 100vw, (max-width: 860px) 50vw, 33vw"
+                          unoptimized={p.images[0]?.startsWith('http')}
                         />
-                        {p.images[1] && (
-                          <Image
-                            src={p.images[1]}
-                            alt={p.name}
-                            fill
-                            className={styles.hoverImg}
-                            sizes="(max-width: 768px) 50vw, 33vw"
-                          />
-                        )}
-                        {p.tag && (
-                          <span className={`${styles.tag} ${isAsa ? styles.tagAsa : styles.tagDofit}`}>
-                            {p.tag}
-                          </span>
-                        )}
+                        <div className={styles.overlay} />
+
+                        {/* Top Badges */}
+                        <div className={styles.cardBadges}>
+                          {p.tag && (
+                            <span className={`${styles.tagBadge} ${isAsa ? styles.tagBadgeAsa : styles.tagBadgeDofit}`}>
+                              {p.tag}
+                            </span>
+                          )}
+                          {isOutOfStock && (
+                            <span className={styles.tagBadge} style={{ background: '#EF4444', color: '#fff' }}>
+                              Sold Out
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Brand Pill */}
+                        <span className={`${styles.brandPill} ${isAsa ? styles.brandPillAsa : styles.brandPillDofit}`}>
+                          {isAsa ? 'Àṣà' : 'Dofit'}
+                        </span>
                       </div>
                     </Link>
 
-                    <div className={styles.cardDetails}>
-                      <div className={styles.cardBrandLine}>
-                        <span className={isAsa ? styles.brandTagAsa : styles.brandTagDofit}>
-                          {isAsa ? 'Àṣà Couture' : 'Dofit Active'}
-                        </span>
-                        <span className={styles.categoryName}>{p.category}</span>
+                    {/* Content */}
+                    <div className={styles.cardInfo}>
+                      <div className={styles.cardMeta}>
+                        <span className={styles.category}>{p.category}</span>
+                        <div className={styles.colors}>
+                          {p.colors?.map((c) => (
+                            <span
+                              key={c.name}
+                              className={styles.colorDot}
+                              style={{ backgroundColor: c.hex }}
+                              title={c.name}
+                            />
+                          ))}
+                        </div>
                       </div>
 
-                      <Link href={`/products/${p.slug}`} className={styles.cardTitleLink}>
-                        <h3 className={`${styles.cardTitle} ${isAsa ? 'asa-display' : 'display'}`}>
+                      <h3 className={`${styles.name} ${isAsa ? 'asa-display' : 'display'}`}>
+                        <Link href={`/products/${p.slug}`} className={styles.nameLink}>
                           {p.name}
-                        </h3>
-                      </Link>
+                        </Link>
+                      </h3>
 
-                      <div className={styles.cardBottomRow}>
+                      <div className={styles.bottomRow}>
                         <span className={styles.price}>{p.formattedPrice}</span>
                         <button
                           type="button"
-                          className={styles.quickAddBtn}
+                          className={`${styles.quickAddBtn} ${isAsa ? styles.quickAddAsa : styles.quickAddDofit}`}
                           onClick={() => handleQuickAdd(p)}
-                          aria-label={`Quick Add ${p.name}`}
+                          aria-label={`Quick add ${p.name}`}
+                          disabled={isOutOfStock}
                         >
-                          + Quick Add
+                          {isOutOfStock ? 'Sold Out' : '+ Bag'}
                         </button>
+                      </div>
+
+                      {/* Sizes Preview */}
+                      <div className={styles.sizeRow}>
+                        {p.sizes?.map((s) => (
+                          <span key={s} className={styles.sizePill}>
+                            {s}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -283,49 +360,141 @@ function ShopContent() {
         </section>
       </main>
 
-      {/* Quick Add Modal */}
-      {quickAddProduct && (
-        <div className={styles.quickModalOverlay} onClick={() => setQuickAddProduct(null)}>
-          <div className={styles.quickModalBox} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.quickModalHeader}>
-              <div className={styles.quickModalImgWrap}>
-                <Image
-                  src={quickAddProduct.images[0]}
-                  alt={quickAddProduct.name}
-                  fill
-                  className={styles.quickModalImg}
-                  sizes="60px"
-                />
-              </div>
-              <div className={styles.quickModalMeta}>
-                <h4 className={`${styles.quickModalTitle} display`}>{quickAddProduct.name}</h4>
-                <p className={styles.quickModalPrice}>{quickAddProduct.formattedPrice}</p>
-              </div>
+      {/* ======================================================== */}
+      {/* MOBILE FILTER & SIZE DRAWER */}
+      {/* ======================================================== */}
+      {drawerOpen && (
+        <div className={styles.drawerOverlay} onClick={(e) => e.target === e.currentTarget && setDrawerOpen(false)}>
+          <aside className={styles.drawer}>
+            <div className={styles.drawerHeader}>
+              <h3 className={styles.drawerTitle}>⚡ Filters &amp; Sizes</h3>
               <button
                 type="button"
-                className={styles.quickModalClose}
-                onClick={() => setQuickAddProduct(null)}
+                className={styles.drawerClose}
+                onClick={() => setDrawerOpen(false)}
               >
                 ✕
               </button>
             </div>
 
-            <div className={styles.quickSizeSection}>
-              <span className={styles.quickSizeLabel}>Select Size:</span>
-              <div className={styles.quickSizePills}>
-                {quickAddProduct.sizes.map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    className={`${styles.quickSizeBtn} ${quickSize === s ? styles.quickSizeActive : ''}`}
-                    onClick={() => setQuickSize(s)}
-                  >
-                    {s}
-                  </button>
-                ))}
+            <div className={styles.drawerBody}>
+              {/* Brand Filter */}
+              <div>
+                <h4 className={styles.drawerSectionTitle}>Brand</h4>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {(['all', 'dofit', 'asa'] as const).map((b) => (
+                    <button
+                      key={b}
+                      type="button"
+                      className={`${styles.sizePillBtn} ${selectedBrand === b ? styles.sizePillBtnActive : ''}`}
+                      onClick={() => setSelectedBrand(b)}
+                    >
+                      {b === 'all' ? 'All' : b === 'dofit' ? 'Dofit Wears' : 'Àṣà Couture'}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Sizes Filter */}
+              <div>
+                <h4 className={styles.drawerSectionTitle}>Size</h4>
+                <div className={styles.sizePillsGrid}>
+                  {AVAILABLE_SIZES.map((size) => (
+                    <button
+                      key={size}
+                      type="button"
+                      className={`${styles.sizePillBtn} ${selectedSize === size ? styles.sizePillBtnActive : ''}`}
+                      onClick={() => setSelectedSize(size)}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Range Filter */}
+              <div>
+                <h4 className={styles.drawerSectionTitle}>Price Range</h4>
+                <div className={styles.priceOptions}>
+                  {[
+                    { id: 'all', label: 'All Prices' },
+                    { id: 'under-40k', label: 'Under ₦40,000' },
+                    { id: '40k-60k', label: '₦40,000 – ₦60,000' },
+                    { id: 'above-60k', label: 'Above ₦60,000' },
+                  ].map((pr) => (
+                    <button
+                      key={pr.id}
+                      type="button"
+                      className={`${styles.priceOptionBtn} ${priceRange === pr.id ? styles.priceOptionBtnActive : ''}`}
+                      onClick={() => setPriceRange(pr.id as any)}
+                    >
+                      {pr.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Availability Filter */}
+              <div>
+                <h4 className={styles.drawerSectionTitle}>Availability</h4>
+                <button
+                  type="button"
+                  className={`${styles.priceOptionBtn} ${inStockOnly ? styles.priceOptionBtnActive : ''}`}
+                  onClick={() => setInStockOnly(!inStockOnly)}
+                >
+                  {inStockOnly ? '✓ Showing In-Stock Only' : 'Show All (Including Sold Out)'}
+                </button>
               </div>
             </div>
 
+            <div className={styles.drawerFooter}>
+              <button
+                type="button"
+                className={styles.resetBtn}
+                onClick={resetAllFilters}
+              >
+                Reset
+              </button>
+              <button
+                type="button"
+                className={styles.applyBtn}
+                onClick={() => setDrawerOpen(false)}
+              >
+                Apply ({filteredProducts.length} Items)
+              </button>
+            </div>
+          </aside>
+        </div>
+      )}
+
+      {/* Quick Add Modal */}
+      {quickAddProduct && (
+        <div className={styles.modalOverlay} onClick={() => setQuickAddProduct(null)}>
+          <div className={styles.modalBox} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h4 className={`${styles.modalTitle} display`}>{quickAddProduct.name}</h4>
+              <button
+                type="button"
+                className={styles.modalClose}
+                onClick={() => setQuickAddProduct(null)}
+              >
+                ✕
+              </button>
+            </div>
+            <p className={styles.modalPrice}>{quickAddProduct.formattedPrice}</p>
+            <p className={styles.sizeGuideHint}>Select your size:</p>
+            <div className={styles.quickSizes}>
+              {quickAddProduct.sizes.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`${styles.quickSizeBtn} ${quickSize === s ? styles.quickSizeActive : ''}`}
+                  onClick={() => setQuickSize(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
             <button
               type="button"
               className="btn btn-pink"

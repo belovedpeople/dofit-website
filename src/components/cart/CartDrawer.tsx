@@ -108,6 +108,7 @@ export default function CartDrawer() {
       (discount > 0 ? `🏷️ *Discount:* -₦${discount.toLocaleString()}\n` : '') +
       `💰 *TOTAL DUE:* *₦${grandTotal.toLocaleString()}*\n` +
       `━━━━━━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `🔗 *Live Order Tracker:* https://dofit-website.vercel.app/track?ref=${orderId}\n\n` +
       `_Hello Dofit Team, I just placed this order on the website. Please provide payment details to confirm dispatch!_`;
 
     // 2. Persist to API so Admin Dashboard sees it immediately
@@ -499,8 +500,17 @@ export default function CartDrawer() {
                   window.open(url, '_blank');
                 }}
               >
-                Re-open WhatsApp Chat
+                💬 Open WhatsApp Chat
               </button>
+
+              <Link
+                href={`/track?ref=${lastOrderRef}`}
+                onClick={closeCart}
+                className={styles.backBtn}
+                style={{ textAlign: 'center', background: 'rgba(255, 30, 106, 0.1)', color: 'var(--pink)', borderColor: 'rgba(255, 30, 106, 0.3)' }}
+              >
+                🚚 Track Package Live →
+              </Link>
 
               <button
                 className="btn btn-outline"

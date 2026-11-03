@@ -50,3 +50,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to update showcase' }, { status: 500 });
   }
 }
+
