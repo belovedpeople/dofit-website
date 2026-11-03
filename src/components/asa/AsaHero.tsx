@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useShowcaseContent } from '@/hooks/useShowcaseContent';
 import { AdireElekoPattern, AdireTeethDivider } from './patterns/YorubaPatterns';
 import styles from './AsaHero.module.css';
 
@@ -14,6 +15,7 @@ const ASA_CULTURAL_TAGLINES = [
 ];
 
 export default function AsaHero() {
+  const { showcase } = useShowcaseContent();
   const imgRef = useRef<HTMLDivElement>(null);
   const patternRef = useRef<HTMLDivElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
@@ -88,7 +90,7 @@ export default function AsaHero() {
       {/* Parallax image — restored original */}
       <div className={styles.imgWrap} ref={imgRef}>
         <Image
-          src="/images/asa/image3.png"
+          src={showcase.asaHero?.mainImage || "/images/asa/image3.png"}
           alt="Àṣà by Dofit"
           fill
           className={styles.img}

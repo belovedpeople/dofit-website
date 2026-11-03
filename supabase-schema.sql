@@ -43,11 +43,19 @@ CREATE TABLE IF NOT EXISTS public.orders (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 3. Enable Row Level Security (RLS)
+-- 3. Create SHOWCASE_CONTENT table (Landing page hero & gallery images)
+CREATE TABLE IF NOT EXISTS public.showcase_content (
+  id TEXT PRIMARY KEY,
+  content JSONB NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 4. Enable Row Level Security (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.showcase_content ENABLE ROW LEVEL SECURITY;
 
--- 4. Allow public access (read & write from the app API)
+-- 5. Allow public access
 DROP POLICY IF EXISTS "Public access for products" ON public.products;
 CREATE POLICY "Public access for products" ON public.products
   FOR ALL USING (true) WITH CHECK (true);
@@ -56,3 +64,8 @@ DROP POLICY IF EXISTS "Public access for orders" ON public.orders;
 CREATE POLICY "Public access for orders" ON public.orders
   FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public access for showcase" ON public.showcase_content;
+CREATE POLICY "Public access for showcase" ON public.showcase_content
+  FOR ALL USING (true) WITH CHECK (true);
+
+NOTIFY pgrst, 'reload schema';

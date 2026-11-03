@@ -1,10 +1,11 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
+import { useShowcaseContent } from '@/hooks/useShowcaseContent';
 import { AdireElekoPattern, AdireTeethDivider } from './patterns/YorubaPatterns';
 import styles from './AsaGallery.module.css';
 
-const galleryItems = [
+const defaultGallery = [
   {
     id: 'look-1',
     category: 'Editorial',
@@ -34,7 +35,13 @@ const galleryItems = [
 const categories = ['All Looks', 'Editorial', 'Runway', 'Capsule'];
 
 export default function AsaGallery() {
+  const { showcase } = useShowcaseContent();
   const [activeCategory, setActiveCategory] = useState('All Looks');
+
+  const galleryItems =
+    showcase.asaGallery && showcase.asaGallery.length > 0
+      ? showcase.asaGallery
+      : defaultGallery;
 
   const filtered =
     activeCategory === 'All Looks'
@@ -49,77 +56,62 @@ export default function AsaGallery() {
       {/* Top Eyin Aja zigzag divider */}
       <AdireTeethDivider color="#E8A020" />
 
-      {/* Background ambient gold & indigo glows */}
-      <div className={styles.glowAura} />
-
       <div className="wrap">
         {/* Header */}
         <div className={`${styles.header} reveal`}>
-          <div className={styles.badge}>
-            <span className={styles.badgeDot} />
-            <span>SEASON 01 — LOOKBOOK</span>
+          <div className={styles.headerLeft}>
+            <p className={`${styles.label} asa-body`}>Couture Lookbook</p>
+            <h2 className={`${styles.title} asa-display`}>
+              THE ADIRE<br />
+              <span className={styles.goldText}>GALLERY</span>
+            </h2>
           </div>
-          <h2 className={`${styles.title} asa-display`}>
-            The Modern <span className={styles.italicGold}>Adire</span> Chronicle
-          </h2>
-          <p className={`${styles.subtitle} asa-body`}>
-            Captured through the lens of young Lagos creatives. Traditional Adire resist-dye techniques reimagined for high-fashion activewear and luxury streetwear.
+          <p className={`${styles.headerDesc} asa-body`}>
+            Hand-dyed in Abeokuta. Styled in Lagos. Seen worldwide.
+            Each silhouette is a canvas where centuries-old indigo resist-dyeing
+            meets contemporary urban streetwear tailoring.
           </p>
-
-          {/* Filter Pills */}
-          <div className={styles.filters}>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`${styles.filterBtn} ${activeCategory === cat ? styles.filterActive : ''}`}
-                onClick={() => setActiveCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Gallery Grid */}
+        {/* Category filter pills */}
+        <div className={styles.filters}>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`${styles.filterBtn} ${activeCategory === cat ? styles.filterBtnActive : ''} asa-body`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Gallery grid */}
         <div className={styles.grid}>
           {filtered.map((item, idx) => (
-            <div key={item.id} className={`${styles.card} reveal`} style={{ animationDelay: `${idx * 0.15}s` }}>
-              <div className={styles.imageContainer}>
+            <div key={item.id || idx} className={`${styles.card} reveal-scale`}>
+              <div className={styles.imgWrap}>
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
-                  className={styles.image}
+                  className={styles.img}
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <div className={styles.overlay}>
-                  <p className={styles.cardQuote}>“{item.quote}”</p>
-                </div>
-                <div className={styles.cardCategory}>{item.category}</div>
+                <div className={styles.imgOverlay} />
+                <span className={`${styles.badge} asa-body`}>{item.category}</span>
               </div>
-
-              <div className={styles.cardDetails}>
+              <div className={styles.cardInfo}>
                 <h3 className={`${styles.cardTitle} asa-display`}>{item.title}</h3>
                 <p className={`${styles.cardTagline} asa-body`}>{item.tagline}</p>
+                <blockquote className={`${styles.cardQuote} asa-display`}>
+                  &ldquo;{item.quote}&rdquo;
+                </blockquote>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Heritage Quote Banner */}
-        <div className={`${styles.quoteBanner} reveal`}>
-          <div className={styles.bannerAdireStrip} />
-          <p className={`${styles.bannerYoruba} asa-display`}>
-            &ldquo;Àṣà kò gbọ́dọ̀ parun — Àṣà ti di aṣọ tí a ń wọ̀.&rdquo;
-          </p>
-          <p className={`${styles.bannerTranslation} asa-body`}>
-            Culture must never perish — Culture has become the garment we wear with pride.
-          </p>
-        </div>
       </div>
-
-      {/* Bottom Eyin Aja zigzag divider */}
-      <AdireTeethDivider color="#E8A020" />
     </section>
   );
 }

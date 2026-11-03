@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useShowcaseContent } from '@/hooks/useShowcaseContent';
 import styles from './DofitHero.module.css';
 
 const HEADLINE_WORDS = [
@@ -21,6 +22,7 @@ const EYEBROW_ITEMS = [
 ];
 
 export default function DofitHero() {
+  const { showcase } = useShowcaseContent();
   const heroRef = useRef<HTMLElement>(null);
   const imgRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
@@ -108,8 +110,8 @@ export default function DofitHero() {
       {/* Parallax image layer */}
       <div className={styles.imgWrap} ref={imgRef}>
         <Image
-          src="/images/dofit-wears/2-Piece Biker Short Set.png"
-          alt="Dofit Wears — 2-Piece Biker Short Set"
+          src={showcase.dofitHero?.mainImage || "/images/dofit-wears/2-Piece Biker Short Set.png"}
+          alt="Dofit Wears — Showcase"
           fill
           className={styles.img}
           priority
@@ -186,8 +188,8 @@ export default function DofitHero() {
       >
         <div className={styles.floatImg}>
           <Image
-            src="/images/dofit-wears/Trim Tank Top.png"
-            alt="Trim Tank Top"
+            src={showcase.dofitHero?.floatingImage || "/images/dofit-wears/Trim Tank Top.png"}
+            alt={showcase.dofitHero?.floatingTitle || "Trim Tank Top"}
             fill
             className={styles.floatImgInner}
             sizes="140px"
@@ -195,8 +197,8 @@ export default function DofitHero() {
         </div>
         <div className={styles.floatInfo}>
           <span className={styles.floatBadge}>Featured Drop</span>
-          <span className={styles.floatName}>Trim Tank Top</span>
-          <span className={styles.floatPrice}>₦18,000</span>
+          <span className={styles.floatName}>{showcase.dofitHero?.floatingTitle || "Trim Tank Top"}</span>
+          <span className={styles.floatPrice}>{showcase.dofitHero?.floatingPrice || "₦18,000"}</span>
         </div>
         <div className={styles.floatPink} />
       </Link>

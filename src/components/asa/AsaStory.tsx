@@ -1,8 +1,17 @@
+'use client';
 import Image from 'next/image';
+import { useShowcaseContent } from '@/hooks/useShowcaseContent';
 import { AdireElekoPattern, AdireTeethDivider } from './patterns/YorubaPatterns';
 import styles from './AsaStory.module.css';
 
 export default function AsaStory() {
+  const { showcase } = useShowcaseContent();
+  const story = showcase.asaStory || {
+    mainImage: '/images/asa/image8.png',
+    yearBadge: '2026',
+    seasonBadge: 'Season Two',
+  };
+
   return (
     <section className={styles.section} id="asa-story">
       {/* Subtle Adire Eleko vector backdrop */}
@@ -17,7 +26,7 @@ export default function AsaStory() {
           <div className={`${styles.imgSide} reveal-left`}>
             <div className={styles.mainImg}>
               <Image
-                src="/images/asa/image8.png"
+                src={story.mainImage || '/images/asa/image8.png'}
                 alt="Àṣà story"
                 fill
                 className={styles.img}
@@ -28,8 +37,8 @@ export default function AsaStory() {
 
             {/* Floating badge */}
             <div className={styles.floatBadge}>
-              <span className={`${styles.badgeText} asa-display`}>2026</span>
-              <span className={`${styles.badgeSub} asa-body`}>Season Two</span>
+              <span className={`${styles.badgeText} asa-display`}>{story.yearBadge || '2026'}</span>
+              <span className={`${styles.badgeSub} asa-body`}>{story.seasonBadge || 'Season Two'}</span>
             </div>
           </div>
 
@@ -51,25 +60,12 @@ export default function AsaStory() {
             </p>
 
             <p className={`${styles.body} asa-body`}>
-              Inspired by the ancient Adire textile art of the Yoruba people — intricate tie-dye patterns
-              hand-crafted with indigo and wax-resist techniques — Àṣà fuses this centuries-old craft
-              with the silhouettes and energy of Gen Z street culture.
+              Each piece is created in collaboration with master Adire artisans in Abeokuta and Osogbo,
+              preserving a resist-dye heritage that spans over three centuries, reframed for tomorrow.
             </p>
-
-            {/* Cultural tags */}
-            <div className={styles.tags}>
-              {['Adire', 'Yoruba Heritage', 'Tie-Dye', 'Gen Z Streetwear', 'Unisex', 'Limited Drops'].map((t) => (
-                <span key={t} className={`${styles.tag} asa-body`}>
-                  {t}
-                </span>
-              ))}
-            </div>
           </div>
         </div>
       </div>
-
-      {/* Bottom Eyin Aja zigzag divider */}
-      <AdireTeethDivider color="#E8A020" />
     </section>
   );
 }

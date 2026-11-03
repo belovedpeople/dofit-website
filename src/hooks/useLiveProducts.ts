@@ -36,3 +36,4 @@ export function useLiveProducts() {
 
   return { products: productsList, loading };
 }
+
