@@ -3,7 +3,8 @@ import { useState, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { products, Product } from '@/data/products';
+import { Product } from '@/data/products';
+import { useLiveProducts } from '@/hooks/useLiveProducts';
 import { useCart } from '@/context/CartContext';
 import DofitNavbar from '@/components/dofit/DofitNavbar';
 import DofitFooter from '@/components/dofit/DofitFooter';
@@ -12,6 +13,7 @@ import styles from './shop.module.css';
 function ShopContent() {
   const searchParams = useSearchParams();
   const initialBrand = searchParams.get('brand');
+  const { products } = useLiveProducts();
 
   const { addToCart } = useCart();
   const [selectedBrand, setSelectedBrand] = useState<'all' | 'dofit' | 'asa'>(

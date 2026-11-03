@@ -55,3 +55,4 @@ CREATE POLICY "Public access for products" ON public.products
 DROP POLICY IF EXISTS "Public access for orders" ON public.orders;
 CREATE POLICY "Public access for orders" ON public.orders
   FOR ALL USING (true) WITH CHECK (true);
+

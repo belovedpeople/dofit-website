@@ -1,7 +1,7 @@
 'use client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { products as allProducts } from '@/data/products';
+import { useLiveProducts } from '@/hooks/useLiveProducts';
 import { useCart } from '@/context/CartContext';
 import {
   AdireElekoPattern,
@@ -9,10 +9,10 @@ import {
 } from './patterns/YorubaPatterns';
 import styles from './AsaProducts.module.css';
 
-const asaProducts = allProducts.filter((p) => p.brand === 'asa');
-
 export default function AsaProducts() {
   const { addToCart } = useCart();
+  const { products: allProducts } = useLiveProducts();
+  const asaProducts = allProducts.filter((p) => p.brand === 'asa');
 
   return (
     <section className={styles.section} id="asa-products">

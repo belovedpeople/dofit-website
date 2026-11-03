@@ -2,13 +2,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
-import { products as allProducts } from '@/data/products';
+import { useLiveProducts } from '@/hooks/useLiveProducts';
 import styles from './DofitCollectionGrid.module.css';
-
-const dofitProducts = allProducts.filter((p) => p.brand === 'dofit');
 
 export default function DofitCollectionGrid() {
   const { addToCart } = useCart();
+  const { products: allProducts } = useLiveProducts();
+  const dofitProducts = allProducts.filter((p) => p.brand === 'dofit');
 
   return (
     <section className={styles.section} id="activewear">

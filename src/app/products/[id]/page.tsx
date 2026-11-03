@@ -1,9 +1,10 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getProductBySlug, products, Product } from '@/data/products';
+import { getProductBySlug, Product } from '@/data/products';
+import { useLiveProducts } from '@/hooks/useLiveProducts';
 import { useCart } from '@/context/CartContext';
 import DofitNavbar from '@/components/dofit/DofitNavbar';
 import AsaNavbar from '@/components/asa/AsaNavbar';
@@ -14,20 +15,37 @@ import styles from './product.module.css';
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params?.id as string;
-  const product = getProductBySlug(slug);
+  const { products: liveProducts, loading: productsLoading } = useLiveProducts();
 
-  if (!product) {
-    notFound();
-  }
+  const product = liveProducts.find((p) => p.slug === slug || p.id === slug) || getProductBySlug(slug);
 
   const { addToCart } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || 'M');
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]?.name || 'Standard');
+  const [selectedSize, setSelectedSize] = useState('M');
+  const [selectedColor, setSelectedColor] = useState('Standard');
   const [quantity, setQuantity] = useState(1);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'features' | 'fabric' | 'shipping'>('features');
   const [addedAnimation, setAddedAnimation] = useState(false);
+
+  useEffect(() => {
+    if (product) {
+      if (product.sizes?.[0]) setSelectedSize(product.sizes[0]);
+      if (product.colors?.[0]?.name) setSelectedColor(product.colors[0].name);
+    }
+  }, [product]);
+
+  if (!product && !productsLoading) {
+    notFound();
+  }
+
+  if (!product) {
+    return (
+      <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+        Loading product...
+      </div>
+    );
+  }
 
   const isAsa = product.brand === 'asa';
 
@@ -37,7 +55,7 @@ export default function ProductDetailPage() {
     setTimeout(() => setAddedAnimation(false), 1500);
   };
 
-  const relatedProducts = products
+  const relatedProducts = liveProducts
     .filter((p) => p.id !== product.id && p.brand === product.brand)
     .slice(0, 3);
 
