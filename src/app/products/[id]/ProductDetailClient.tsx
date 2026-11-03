@@ -202,15 +202,13 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                 />
               ) : (
                 <>
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     key={currentMedia.url}
                     src={currentMedia.url}
                     alt={product.name}
-                    fill
-                    priority
                     className={styles.mainImage}
-                    sizes="(max-width: 900px) 100vw, 50vw"
-                    unoptimized={currentMedia.url.startsWith('http')}
+                    loading="eager"
                   />
                   <button
                     type="button"
@@ -249,13 +247,12 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                         <span className={styles.videoPlayBadge}>▶ Video</span>
                       </div>
                     ) : (
-                      <Image
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={media.url}
                         alt=""
-                        fill
                         className={styles.thumbImg}
-                        sizes="90px"
-                        unoptimized={media.url.startsWith('http')}
+                        loading="lazy"
                       />
                     )}
                   </button>
@@ -657,13 +654,11 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                     cursor: zoomLevel > 1 ? 'grab' : 'zoom-in',
                   }}
                 >
-                  <Image
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
                     src={mediaList[lightboxIndex]?.url || ''}
                     alt={product.name}
-                    fill
                     className={styles.lightboxImg}
-                    priority
-                    unoptimized={mediaList[lightboxIndex]?.url?.startsWith('http')}
                   />
                 </div>
               )}
@@ -700,13 +695,11 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                     {m.type === 'video' ? (
                       <span className={styles.lightboxThumbPlay}>▶ Video</span>
                     ) : (
-                      <Image
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={m.url}
                         alt=""
-                        fill
                         className={styles.lightboxThumbImg}
-                        sizes="60px"
-                        unoptimized={m.url.startsWith('http')}
                       />
                     )}
                   </button>
