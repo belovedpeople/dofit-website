@@ -1,0 +1,252 @@
+.container {
+  min-height: 100vh;
+  background: var(--black);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  padding-top: 130px;
+  padding-bottom: 120px;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 40px 0 80px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--pink);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.heroTitle {
+  font-size: clamp(38px, 6vw, 76px);
+  margin-bottom: 24px;
+}
+
+.pinkText {
+  color: var(--pink);
+}
+
+.heroLead {
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--white-70, rgba(255,255,255,0.7));
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* Split Section */
+.splitSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  margin-bottom: 120px;
+}
+
+.pillarCard {
+  background: var(--black-card);
+  border: 1px solid var(--white-08);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.4s var(--ease-out), border-color 0.4s ease;
+}
+
+.pillarCard:hover {
+  transform: translateY(-8px);
+}
+
+.pillarDofit:hover {
+  border-color: rgba(255, 30, 106, 0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 30, 106, 0.15);
+}
+
+.pillarAsa:hover {
+  border-color: rgba(232, 160, 32, 0.5);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(232, 160, 32, 0.15);
+}
+
+.pillarImgWrap {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #000;
+  overflow: hidden;
+}
+
+.pillarImg {
+  object-fit: cover;
+  transition: transform 0.7s var(--ease-out);
+}
+
+.pillarCard:hover .pillarImg {
+  transform: scale(1.06);
+}
+
+.pillarOverlayDofit {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(10, 10, 10, 0.95) 100%);
+}
+
+.pillarOverlayAsa {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 30%, rgba(13, 11, 31, 0.95) 100%);
+}
+
+.pillarContent {
+  padding: 36px 32px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.pillarTagDofit {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pink);
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+}
+
+.pillarTagAsa {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--asa-gold);
+  letter-spacing: 0.15em;
+  margin-bottom: 8px;
+}
+
+.pillarTitle {
+  font-size: 34px;
+  margin-bottom: 16px;
+  color: var(--white);
+}
+
+.pillarDesc {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--white-70, rgba(255,255,255,0.7));
+  margin-bottom: 28px;
+  flex: 1;
+}
+
+/* Values Section */
+.valuesSection {
+  background: var(--black-soft);
+  border-top: 1px solid var(--white-08);
+  border-bottom: 1px solid var(--white-08);
+  padding: 100px 0;
+  margin-bottom: 120px;
+}
+
+.valuesHeadline {
+  font-size: clamp(32px, 5vw, 56px);
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.valueCard {
+  background: var(--black-card);
+  border: 1px solid var(--white-08);
+  padding: 36px 28px;
+  border-radius: 6px;
+  position: relative;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.valueCard:hover {
+  transform: translateY(-6px);
+  border-color: var(--white-20);
+}
+
+.valueNumber {
+  font-family: var(--font-display);
+  font-size: 48px;
+  color: var(--pink);
+  line-height: 1;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.valueName {
+  font-size: 22px;
+  margin-bottom: 12px;
+  color: var(--white);
+}
+
+.valueText {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--white-70, rgba(255,255,255,0.7));
+}
+
+/* Quote Section */
+.quoteSection {
+  text-align: center;
+}
+
+.quoteBox {
+  background: linear-gradient(135deg, rgba(255, 30, 106, 0.08) 0%, rgba(27, 63, 160, 0.08) 100%);
+  border: 1px solid var(--white-08);
+  border-radius: 8px;
+  padding: 60px 48px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.quoteText {
+  font-family: var(--font-asa-disp);
+  font-size: clamp(24px, 3.5vw, 36px);
+  line-height: 1.4;
+  font-style: italic;
+  color: var(--white);
+  margin-bottom: 28px;
+}
+
+.authorRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.authorName {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--pink);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.authorRole {
+  font-size: 12px;
+  color: var(--white-50);
+}
+
+@media (max-width: 960px) {
+  .splitSection {
+    grid-template-columns: 1fr;
+  }
+  .valuesGrid {
+    grid-template-columns: 1fr;
+  }
+}

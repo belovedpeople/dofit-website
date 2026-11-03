@@ -1,0 +1,210 @@
+.section {
+  background: var(--asa-void);
+  padding: var(--space-2xl) 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 80px;
+  align-items: center;
+  padding-top: var(--space-lg);
+  position: relative;
+  z-index: 2;
+}
+
+/* Image side */
+.imgSide { position: relative; }
+
+.mainImg {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+}
+
+.img {
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.8s var(--ease-out);
+}
+
+.mainImg:hover .img { transform: scale(1.04); }
+
+.imgBorder {
+  position: absolute;
+  inset: 12px;
+  border: 1px solid var(--asa-line);
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+/* Floating badge */
+.floatBadge {
+  position: absolute;
+  right: -28px;
+  bottom: 48px;
+  background: #E8A020;
+  color: #0D0B1F;
+  padding: 16px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(232, 160, 32, 0.3);
+  animation: float 5s ease-in-out infinite;
+  z-index: 3;
+}
+
+.badgeText {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.badgeSub {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+/* Floating Opambata staff talisman */
+.staffTalisman {
+  position: absolute;
+  top: -24px;
+  left: -24px;
+  filter: drop-shadow(0 10px 25px rgba(232, 160, 32, 0.3));
+  animation: float 6s ease-in-out infinite 1s;
+  z-index: 3;
+}
+
+/* Copy side */
+.copySide { display: flex; flex-direction: column; gap: 20px; }
+
+.eyebrowRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--asa-gold);
+}
+
+.quote {
+  font-size: clamp(24px, 3vw, 38px);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--asa-cream);
+  line-height: 1.25;
+  border: none;
+}
+
+.quoteAttr {
+  font-size: 12.5px;
+  color: var(--asa-cream-30);
+  margin-top: -8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Yoruba Proverb Box */
+.proverbCard {
+  background: rgba(232, 160, 32, 0.08);
+  border-left: 3px solid #E8A020;
+  border-radius: 0 12px 12px 0;
+  padding: 18px 22px;
+  margin: 6px 0;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.proverbHeader {
+  margin-bottom: 6px;
+}
+
+.proverbBadge {
+  font-family: var(--font-asa-body);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #E8A020;
+}
+
+.proverbYoruba {
+  font-size: 20px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.proverbEnglish {
+  font-size: 13px;
+  color: rgba(242, 232, 213, 0.8);
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.body {
+  font-size: 15.5px;
+  color: var(--asa-cream-70);
+  line-height: 1.75;
+  font-weight: 300;
+}
+
+.body strong {
+  color: #F2E8D5;
+}
+
+.body em {
+  font-style: italic;
+  color: var(--asa-gold);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.tag {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--asa-cream-70);
+  padding: 6px 14px;
+  border: 1px solid var(--asa-line);
+  background: rgba(18, 14, 42, 0.6);
+  border-radius: 4px;
+  transition: all 0.25s ease;
+}
+
+.tag:hover {
+  border-color: var(--asa-gold);
+  color: var(--asa-gold);
+  background: rgba(232, 160, 32, 0.1);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (max-width: 860px) {
+  .grid { grid-template-columns: 1fr; gap: 56px; }
+  .floatBadge { right: 12px; bottom: 12px; }
+  .staffTalisman { top: 12px; left: 12px; }
+}

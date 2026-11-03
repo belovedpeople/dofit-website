@@ -1,0 +1,131 @@
+.audioWrap {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 990;
+  pointer-events: auto;
+}
+
+.playerCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(14, 11, 34, 0.88);
+  border: 1px solid rgba(232, 160, 32, 0.35);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 10px 14px 10px 16px;
+  border-radius: 100px;
+  color: #FFFFFF;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55), 0 0 20px rgba(232, 160, 32, 0.15);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.playerCard:hover {
+  background: rgba(22, 17, 50, 0.95);
+  border-color: #E8A020;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.65), 0 0 25px rgba(232, 160, 32, 0.28);
+}
+
+.playing {
+  border-color: #E8A020;
+  background: linear-gradient(135deg, rgba(27, 63, 160, 0.32) 0%, rgba(232, 160, 32, 0.22) 100%), rgba(14, 11, 34, 0.95);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), 0 0 25px rgba(232, 160, 32, 0.35);
+}
+
+/* Equalizer Bars */
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 18px;
+  width: 18px;
+}
+
+.eqBar {
+  width: 3px;
+  background: #E8A020;
+  border-radius: 2px;
+  height: 4px;
+  transition: height 0.2s ease;
+}
+
+.playing .eq1 { animation: barDance 0.65s ease-in-out infinite alternate; }
+.playing .eq2 { animation: barDance 0.85s ease-in-out infinite 0.18s alternate; }
+.playing .eq3 { animation: barDance 0.55s ease-in-out infinite 0.32s alternate; }
+.playing .eq4 { animation: barDance 0.75s ease-in-out infinite 0.1s alternate; }
+
+@keyframes barDance {
+  0% { height: 4px; opacity: 0.6; }
+  100% { height: 18px; opacity: 1; }
+}
+
+/* Info Column */
+.infoCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.trackTitle {
+  font-family: var(--font-asa-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #E8A020;
+  line-height: 1.15;
+}
+
+.trackSub {
+  font-family: var(--font-asa-body);
+  font-size: 11px;
+  color: rgba(242, 232, 213, 0.75);
+  line-height: 1.25;
+}
+
+/* Dedicated Mute Button */
+.muteBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #E8A020;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  margin-left: 4px;
+}
+
+.muteBtn:hover {
+  background: rgba(232, 160, 32, 0.25);
+  border-color: #E8A020;
+  transform: scale(1.08);
+}
+
+@media (max-width: 768px) {
+  .audioWrap {
+    bottom: 20px;
+    left: 16px;
+  }
+  .playerCard {
+    padding: 8px 12px;
+    gap: 10px;
+  }
+  .trackTitle {
+    font-size: 9.5px;
+  }
+  .trackSub {
+    font-size: 10.5px;
+  }
+}
+
+:global(html.app-mode) .audioWrap {
+  bottom: calc(76px + env(safe-area-inset-bottom, 0px));
+}

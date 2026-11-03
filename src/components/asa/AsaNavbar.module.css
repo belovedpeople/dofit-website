@@ -1,0 +1,378 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  transition: all 0.35s ease;
+}
+
+/* Top micro-bar with cultural banner */
+.adireTopBar {
+  background: #090714;
+  border-bottom: 1px solid rgba(232, 160, 32, 0.2);
+  padding: 6px 0;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+}
+
+.barContent {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--pad-x);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.barText {
+  color: var(--asa-cream-70);
+  font-family: var(--font-asa-body);
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.switchLink {
+  color: var(--asa-gold);
+  font-family: var(--font-asa-body);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.switchLink:hover {
+  color: var(--asa-gold-lt);
+  text-decoration: underline;
+}
+
+/* Main Nav */
+.nav {
+  padding: 16px 0;
+  background: rgba(13, 11, 31, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(232, 160, 32, 0.15);
+  transition: all 0.35s ease;
+}
+
+.headerScrolled .nav {
+  padding: 12px 0;
+  background: rgba(13, 11, 31, 0.95);
+  border-bottom-color: rgba(232, 160, 32, 0.3);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.navInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Brand */
+.brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.brandTitle {
+  font-family: var(--font-asa-disp);
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--asa-cream);
+  letter-spacing: 0.12em;
+  text-shadow: 0 0 20px rgba(232, 160, 32, 0.25);
+  transition: color 0.25s ease;
+}
+
+.brandSub {
+  font-family: var(--font-asa-body);
+  font-size: 9px;
+  letter-spacing: 0.3em;
+  color: var(--asa-gold);
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.brand:hover .brandTitle {
+  color: var(--asa-gold);
+}
+
+/* Nav links */
+.links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  list-style: none;
+}
+
+.link {
+  font-family: var(--font-asa-body);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--asa-cream-70);
+  font-weight: 500;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.link::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--asa-gold);
+  transition: width 0.3s var(--ease-out);
+}
+
+.link:hover {
+  color: var(--asa-gold);
+}
+
+.link:hover::after {
+  width: 100%;
+}
+
+.linkDofit {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--white-85);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 30, 106, 0.3);
+  background: rgba(255, 30, 106, 0.08);
+  letter-spacing: 0.04em;
+  transition: all 0.25s ease;
+}
+
+.dofitDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pink);
+  box-shadow: 0 0 8px var(--pink);
+}
+
+.linkDofit:hover {
+  background: rgba(255, 30, 106, 0.2);
+  border-color: var(--pink);
+  color: var(--white);
+  transform: translateY(-1px);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cartBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(232, 160, 32, 0.08);
+  border: 1px solid rgba(232, 160, 32, 0.25);
+  color: var(--asa-gold);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.cartBtn:hover {
+  background: rgba(232, 160, 32, 0.2);
+  border-color: var(--asa-gold);
+  transform: translateY(-1px);
+  box-shadow: 0 0 12px rgba(232, 160, 32, 0.3);
+}
+
+.cartBadge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--asa-gold);
+  color: var(--asa-void);
+  font-family: var(--font-asa-body);
+  font-size: 10px;
+  font-weight: 800;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px rgba(232, 160, 32, 0.5);
+}
+
+/* Hamburger */
+.menuBtn {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.menuLine {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--asa-cream);
+  border-radius: 2px;
+  transition: all 0.3s ease;
+}
+
+.openTop {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.openMid {
+  opacity: 0;
+}
+
+.openBot {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile Drawer */
+.mobileDrawer {
+  position: fixed;
+  top: 85px;
+  left: 0;
+  right: 0;
+  background: rgba(13, 11, 31, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--asa-line);
+  padding: 30px var(--pad-x);
+  transform: translateY(-120%);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.35s ease;
+}
+
+.mobileDrawerOpen {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drawerContent {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.drawerLink {
+  font-family: var(--font-asa-disp);
+  font-size: 26px;
+  color: var(--asa-cream);
+  transition: color 0.2s ease;
+}
+
+.drawerLink:hover {
+  color: var(--asa-gold);
+}
+
+.drawerDivider {
+  height: 1px;
+  background: var(--asa-line);
+  margin: 10px 0;
+}
+
+.drawerLinkDofit {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--pink);
+}
+
+.mobileInstallNavBtn {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  background: rgba(232, 160, 32, 0.12);
+  border: 1px solid rgba(232, 160, 32, 0.35);
+  color: var(--asa-gold);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.mobileInstallNavBtn:hover {
+  background: rgba(232, 160, 32, 0.25);
+  transform: translateY(-1px);
+}
+
+.drawerInstallBtn {
+  width: 100%;
+  background: rgba(232, 160, 32, 0.08);
+  border: 1px solid rgba(232, 160, 32, 0.25);
+  border-radius: 12px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #FFFFFF;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.drawerInstallBtn:hover {
+  background: rgba(232, 160, 32, 0.18);
+}
+
+.installIconBox {
+  font-size: 22px;
+}
+
+.drawerInstallBtn strong {
+  display: block;
+  font-size: 13.5px;
+  color: #FFFFFF;
+}
+
+.drawerInstallBtn small {
+  display: block;
+  font-size: 11px;
+  color: var(--asa-gold);
+  margin-top: 2px;
+}
+
+@media (max-width: 960px) {
+  .links {
+    display: none;
+  }
+  .mobileInstallNavBtn {
+    display: flex;
+  }
+  .menuBtn {
+    display: flex;
+  }
+  .mobileDrawer {
+    display: block;
+  }
+  .adireTopBar {
+    display: none;
+  }
+}

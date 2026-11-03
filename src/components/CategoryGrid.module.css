@@ -1,0 +1,144 @@
+.section {
+  padding: var(--space-2xl) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 52px;
+}
+
+.eyebrow {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--clay);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--clay);
+}
+
+.title {
+  font-size: clamp(30px, 3.5vw, 46px);
+  font-weight: 500;
+  line-height: 1.05;
+  color: var(--ink);
+}
+
+.desc {
+  font-size: 15.5px;
+  color: var(--stone);
+  line-height: 1.65;
+  max-width: 46ch;
+  align-self: end;
+}
+
+/* Grid */
+.grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 18px;
+}
+
+.col {
+  display: grid;
+  gap: 18px;
+}
+
+/* Tile */
+.tile {
+  position: relative;
+  overflow: hidden;
+  background: #111;
+  display: block;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.tileLarge {
+  aspect-ratio: 4/5;
+}
+
+.col .tile {
+  aspect-ratio: 4/3;
+}
+
+.tileImg {
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.7s var(--ease-out);
+}
+
+.tile:hover .tileImg {
+  transform: scale(1.055);
+}
+
+.tileOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(23, 20, 15, 0.72) 0%,
+    rgba(23, 20, 15, 0.1) 50%,
+    transparent 100%
+  );
+  transition: opacity 0.4s ease;
+}
+
+.tile:hover .tileOverlay {
+  opacity: 0.8;
+}
+
+.tileLabel {
+  position: absolute;
+  left: 24px;
+  bottom: 22px;
+  color: #fff;
+}
+
+.tileName {
+  display: block;
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.tileSub {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* Àṣà tile special styling */
+.tileAsa .tileOverlay {
+  background: linear-gradient(
+    to top,
+    rgba(27, 26, 34, 0.82) 0%,
+    rgba(27, 26, 34, 0.15) 55%,
+    transparent 100%
+  );
+}
+
+.tileAsa .tileName {
+  color: var(--gilt);
+}
+
+@media (max-width: 860px) {
+  .head { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+  .tileLarge { aspect-ratio: 4/3; }
+}

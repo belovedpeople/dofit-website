@@ -1,0 +1,165 @@
+.section {
+  padding: var(--space-2xl) 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.inner {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 80px;
+  align-items: center;
+}
+
+/* Image column */
+.imageCol {
+  position: relative;
+}
+
+.frame {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  background: #111;
+  border-radius: 3px;
+}
+
+.img {
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.8s var(--ease-out);
+}
+
+.frame:hover .img { transform: scale(1.04); }
+
+/* Floating stat card */
+.statCard {
+  position: absolute;
+  right: -32px;
+  bottom: 48px;
+  background: var(--ink);
+  color: var(--bone);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-radius: 3px;
+  min-width: 180px;
+  box-shadow: 0 20px 60px rgba(23, 20, 15, 0.25);
+  animation: float 5s ease-in-out infinite;
+}
+
+.statYear {
+  font-size: 36px;
+  font-weight: 400;
+  color: var(--mauve);
+  line-height: 1;
+}
+
+.statText {
+  font-size: 12.5px;
+  color: rgba(246, 241, 233, 0.7);
+  letter-spacing: 0.03em;
+}
+
+.statLine {
+  width: 28px;
+  height: 1px;
+  background: rgba(246, 241, 233, 0.2);
+  margin: 4px 0;
+}
+
+.statSub {
+  font-size: 11.5px;
+  color: rgba(246, 241, 233, 0.5);
+  letter-spacing: 0.03em;
+}
+
+/* Copy */
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.eyebrow {
+  font-size: 11.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--clay);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 28px;
+  height: 1px;
+  background: var(--clay);
+}
+
+.quote {
+  font-size: clamp(24px, 2.8vw, 34px);
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--ink);
+  border: none;
+}
+
+.who {
+  font-size: 13.5px;
+  color: var(--stone);
+  margin-top: -10px;
+}
+
+.body {
+  font-size: 15.5px;
+  color: #3a362f;
+  line-height: 1.7;
+  max-width: 52ch;
+}
+
+/* Values */
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 4px 0;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--stone);
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 100px;
+  transition: all 0.25s ease;
+}
+
+.value:hover {
+  border-color: var(--clay);
+  color: var(--clay);
+}
+
+.valueDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--mauve);
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .inner { grid-template-columns: 1fr; gap: 56px; }
+  .statCard { right: 0; bottom: -24px; }
+  .imageCol { padding-bottom: 40px; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}

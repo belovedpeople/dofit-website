@@ -1,0 +1,152 @@
+.splashContainer {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  background: #09090C;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: none;
+  overflow: hidden;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s ease;
+}
+
+.splashFadeOut {
+  opacity: 0;
+  transform: scale(1.04);
+  pointer-events: none;
+}
+
+.ambientGlow {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 30, 106, 0.25) 0%, rgba(232, 160, 32, 0.15) 50%, transparent 70%);
+  filter: blur(40px);
+  animation: glowPulse 3s ease-in-out infinite alternate;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.emblemWrap {
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.logoCircle {
+  width: 90px;
+  height: 90px;
+  border-radius: 24px;
+  background: #000000;
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 30, 106, 0.3);
+  animation: logoPop 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.logoImg {
+  object-fit: contain;
+}
+
+.ringPulse {
+  position: absolute;
+  inset: -8px;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 30, 106, 0.5);
+  animation: rippleRing 2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.brandTitle {
+  font-family: var(--font-display, sans-serif);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #FFFFFF;
+  margin: 0 0 8px;
+  animation: textRise 0.8s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.brandAmp {
+  color: #FF1E6A;
+  font-weight: 400;
+  margin: 0 4px;
+}
+
+.brandTagline {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.04em;
+  margin: 0 0 32px;
+  font-weight: 500;
+  animation: textRise 0.8s 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.loadingTrack {
+  width: 140px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.loadingBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #FF1E6A, #E8A020);
+  border-radius: 999px;
+  transform: translateX(-100%);
+  animation: barSlide 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.footerBrand {
+  position: absolute;
+  bottom: 36px;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
+@keyframes logoPop {
+  0% { transform: scale(0.7) translateY(15px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes textRise {
+  0% { transform: translateY(12px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes barSlide {
+  0% { transform: translateX(-100%); }
+  60% { transform: translateX(-10%); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes rippleRing {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+@keyframes glowPulse {
+  0% { transform: scale(0.9); opacity: 0.6; }
+  100% { transform: scale(1.2); opacity: 1; }
+}

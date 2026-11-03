@@ -1,0 +1,134 @@
+.bottomBar {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 990;
+  background: rgba(10, 10, 14, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
+  align-items: center;
+  justify-content: space-around;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.7);
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.tabItem {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 4px 10px;
+  position: relative;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tabItem:active {
+  transform: scale(0.92);
+}
+
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+}
+
+.tabLabel {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.tabActive {
+  color: #FF1E6A;
+}
+
+.tabActive .tabLabel {
+  color: #FFFFFF;
+}
+
+.activeDot {
+  position: absolute;
+  bottom: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #FF1E6A;
+  box-shadow: 0 0 6px #FF1E6A;
+}
+
+.asaTab {
+  color: rgba(232, 160, 32, 0.6);
+}
+
+.tabActiveAsa {
+  color: #E8A020 !important;
+}
+
+.tabActiveAsa .tabLabel {
+  color: #FFFFFF;
+}
+
+.activeDotAsa {
+  position: absolute;
+  bottom: -2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #E8A020;
+  box-shadow: 0 0 6px #E8A020;
+}
+
+.bagBadge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  background: #FF1E6A;
+  color: #FFFFFF;
+  font-size: 9.5px;
+  font-weight: 800;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #0A0A0E;
+}
+
+/* Standout WhatsApp tab */
+.chatTab {
+  color: #25D366;
+}
+
+.chatIconCircle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.15);
+  border: 1px solid rgba(37, 211, 102, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #25D366;
+  transition: all 0.2s ease;
+}
+
+.chatTab:hover .chatIconCircle,
+.chatTab:active .chatIconCircle {
+  background: #25D366;
+  color: #FFFFFF;
+  transform: scale(1.08);
+}

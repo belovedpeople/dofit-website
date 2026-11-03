@@ -1,0 +1,38 @@
+.strip {
+  background: var(--ink);
+  color: var(--bone);
+  padding: 12px 0;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(246, 241, 233, 0.08);
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+}
+
+.item {
+  white-space: nowrap;
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 28px;
+  color: var(--bone);
+  opacity: 0.88;
+}
+
+.item:nth-child(2n) {
+  color: var(--mauve);
+  opacity: 1;
+  font-size: 10px;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.strip:hover .track {
+  animation-play-state: paused;
+}
