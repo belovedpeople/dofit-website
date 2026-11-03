@@ -87,12 +87,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  cursor: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  body { cursor: none; }
+  a { cursor: none; }
+  button { cursor: none; }
 }
 
 img { display: block; max-width: 100%; height: auto; }
-a { color: inherit; text-decoration: none; cursor: none; }
-button { cursor: none; border: none; background: none; font-family: inherit; }
+a { color: inherit; text-decoration: none; }
+button { border: none; background: none; font-family: inherit; }
 input, textarea { font-family: inherit; }
 ul, ol { list-style: none; }
 
@@ -357,20 +362,30 @@ ul, ol { list-style: none; }
   a, button { cursor: pointer !important; }
 }
 
-html, body {
-  max-width: 100%;
-  overflow-x: hidden;
-  position: relative;
-}
-
 /* ================================================
    NATIVE APP MODE (PWA / STANDALONE APP FEEL)
    ================================================ */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y pinch-zoom;
+  position: relative;
+}
+
+html.app-mode,
 html.app-mode body {
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)) !important;
-  overscroll-behavior-y: none;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y pinch-zoom !important;
+  height: auto !important;
+  min-height: 100% !important;
+}
+
+html.app-mode body {
+  padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
   -webkit-tap-highlight-color: transparent;
-  user-select: none;
 }
 
 html.app-mode input,

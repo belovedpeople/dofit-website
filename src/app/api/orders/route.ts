@@ -158,6 +158,21 @@ export async function POST(req: Request) {
       }
     }
 
+    // ── 3. INCREMENT VOUCHER USAGE (if voucher code was applied) ─────────
+    if (body.voucherCode) {
+      const vCode = String(body.voucherCode).trim().toUpperCase();
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data: vData } = await supabase.from('vouchers').select('used_count').eq('code', vCode).single();
+          if (vData) {
+            await supabase.from('vouchers').update({ used_count: (vData.used_count || 0) + 1 }).eq('code', vCode);
+          }
+        } catch (vErr) {
+          console.error('Failed to increment voucher usage in Supabase:', vErr);
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, order: newOrder }, { status: 201 });
   } catch (error) {
     console.error('Order creation error:', error);

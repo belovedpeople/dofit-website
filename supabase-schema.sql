@@ -50,12 +50,27 @@ CREATE TABLE IF NOT EXISTS public.showcase_content (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 4. Enable Row Level Security (RLS)
+-- 4. Create VOUCHERS table
+CREATE TABLE IF NOT EXISTS public.vouchers (
+  id TEXT PRIMARY KEY,
+  code TEXT UNIQUE NOT NULL,
+  discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed')),
+  discount_value NUMERIC NOT NULL,
+  min_spend NUMERIC DEFAULT 0,
+  max_uses INTEGER DEFAULT 0,
+  used_count INTEGER DEFAULT 0,
+  expires_at TIMESTAMPTZ,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 5. Enable Row Level Security (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.showcase_content ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vouchers ENABLE ROW LEVEL SECURITY;
 
--- 5. Allow public access
+-- 6. Allow public access
 DROP POLICY IF EXISTS "Public access for products" ON public.products;
 CREATE POLICY "Public access for products" ON public.products
   FOR ALL USING (true) WITH CHECK (true);
@@ -66,6 +81,10 @@ CREATE POLICY "Public access for orders" ON public.orders
 
 DROP POLICY IF EXISTS "Public access for showcase" ON public.showcase_content;
 CREATE POLICY "Public access for showcase" ON public.showcase_content
+  FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public access for vouchers" ON public.vouchers;
+CREATE POLICY "Public access for vouchers" ON public.vouchers
   FOR ALL USING (true) WITH CHECK (true);
 
 NOTIFY pgrst, 'reload schema';

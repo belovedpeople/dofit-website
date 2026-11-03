@@ -1,10 +1,22 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AdireElekoPattern, AdireTeethDivider } from './patterns/YorubaPatterns';
 import styles from './AsaFooter.module.css';
 import NewsletterForm from '../NewsletterForm';
+import { useShowcaseContent } from '@/hooks/useShowcaseContent';
 
 export default function AsaFooter() {
+  const { showcase } = useShowcaseContent();
+  const socials = showcase.socialLinks || {};
+
+  const socialList = [
+    { char: 'I', label: 'Instagram', url: socials.instagram || 'https://instagram.com/dofitwears' },
+    { char: 'T', label: 'TikTok', url: socials.tiktok || 'https://tiktok.com/@dofitwears' },
+    { char: 'X', label: 'Twitter', url: socials.twitter || 'https://x.com/dofitwears' },
+    ...(socials.whatsapp ? [{ char: 'W', label: 'WhatsApp', url: socials.whatsapp.startsWith('http') ? socials.whatsapp : `https://wa.me/${socials.whatsapp.replace(/[^0-9]/g, '')}` }] : []),
+  ];
+
   return (
     <footer className={styles.footer}>
       {/* Eyin Aja zigzag divider top border */}
@@ -24,15 +36,17 @@ export default function AsaFooter() {
           </div>
           <p className={`${styles.tagline} asa-body`}>Culture as couture. Heritage as fashion.</p>
           <div className={styles.socials}>
-            {['I', 'T', 'X'].map((s, i) => (
+            {socialList.map((s, i) => (
               <a
                 key={i}
-                href="#"
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={styles.social}
-                aria-label={['Instagram', 'TikTok', 'Twitter'][i]}
+                aria-label={s.label}
                 id={`asa-footer-social-${i}`}
               >
-                <span className={`${styles.socialChar} asa-body`}>{s}</span>
+                <span className={`${styles.socialChar} asa-body`}>{s.char}</span>
               </a>
             ))}
           </div>

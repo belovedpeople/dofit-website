@@ -1,9 +1,21 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './DofitFooter.module.css';
 import NewsletterForm from '../NewsletterForm';
+import { useShowcaseContent } from '@/hooks/useShowcaseContent';
 
 export default function DofitFooter() {
+  const { showcase } = useShowcaseContent();
+  const socials = showcase.socialLinks || {};
+
+  const socialList = [
+    { name: 'Instagram', label: 'I', url: socials.instagram || 'https://instagram.com/dofitwears' },
+    { name: 'TikTok', label: 'T', url: socials.tiktok || 'https://tiktok.com/@dofitwears' },
+    { name: 'Twitter', label: 'X', url: socials.twitter || 'https://x.com/dofitwears' },
+    ...(socials.whatsapp ? [{ name: 'WhatsApp', label: 'W', url: socials.whatsapp.startsWith('http') ? socials.whatsapp : `https://wa.me/${socials.whatsapp.replace(/[^0-9]/g, '')}` }] : []),
+  ];
+
   return (
     <footer className={styles.footer} id="footer">
       {/* Top pink line */}
@@ -18,9 +30,17 @@ export default function DofitFooter() {
           </div>
           <p className={styles.brandTag}>Built to perform. Made to be seen.</p>
           <div className={styles.socials}>
-            {['Instagram','TikTok','Twitter'].map(s => (
-              <a key={s} href="#" className={styles.social} aria-label={s} id={`footer-${s.toLowerCase()}`}>
-                <span className={styles.socialLabel}>{s[0]}</span>
+            {socialList.map(s => (
+              <a
+                key={s.name}
+                href={s.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.social}
+                aria-label={s.name}
+                id={`footer-${s.name.toLowerCase()}`}
+              >
+                <span className={styles.socialLabel}>{s.label}</span>
               </a>
             ))}
           </div>

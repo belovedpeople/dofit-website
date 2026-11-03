@@ -24,6 +24,8 @@ export default function CartDrawer() {
   const [discount, setDiscount] = useState(0);
   const [promoError, setPromoError] = useState('');
   const [promoSuccess, setPromoSuccess] = useState('');
+  const [appliedVoucher, setAppliedVoucher] = useState('');
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
   // Steps: 'cart' | 'checkout' | 'success'
   const [step, setStep] = useState<'cart' | 'checkout' | 'success'>('cart');
@@ -42,21 +44,37 @@ export default function CartDrawer() {
 
   const grandTotal = Math.max(0, subtotal - discount);
 
-  const applyPromo = (e: React.FormEvent) => {
+  const applyPromo = async (e: React.FormEvent) => {
     e.preventDefault();
     setPromoError('');
     setPromoSuccess('');
     const code = promoCode.trim().toUpperCase();
-    if (code === 'DOFIT20' || code === 'GENZ20') {
-      const disc = Math.round(subtotal * 0.2);
-      setDiscount(disc);
-      setPromoSuccess('20% discount applied!');
-    } else if (code === 'ASA10') {
-      const disc = Math.round(subtotal * 0.1);
-      setDiscount(disc);
-      setPromoSuccess('10% Àṣà culture discount applied!');
-    } else {
-      setPromoError('Invalid code. Try DOFIT20 or ASA10');
+    if (!code) {
+      setPromoError('Please enter a voucher code');
+      return;
+    }
+
+    setIsApplyingPromo(true);
+    try {
+      const res = await fetch('/api/vouchers/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code, subtotal }),
+      });
+      const data = await res.json();
+      if (data.success && data.discount) {
+        setDiscount(data.discount);
+        setAppliedVoucher(code);
+        setPromoSuccess(data.message || `₦${data.discount.toLocaleString()} discount applied!`);
+      } else {
+        setDiscount(0);
+        setAppliedVoucher('');
+        setPromoError(data.error || 'Invalid voucher code');
+      }
+    } catch {
+      setPromoError('Unable to validate voucher right now.');
+    } finally {
+      setIsApplyingPromo(false);
     }
   };
 
@@ -141,6 +159,7 @@ export default function CartDrawer() {
           totalAmount: grandTotal,
           brand: brandType,
           notes: formData.notes,
+          voucherCode: appliedVoucher || undefined,
         }),
       });
     } catch (err) {

@@ -462,3 +462,4 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
     </div>
   );
 }
+

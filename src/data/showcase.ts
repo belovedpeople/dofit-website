@@ -27,9 +27,23 @@ export interface ShowcaseContent {
     image: string;
     quote: string;
   }>;
+  socialLinks?: {
+    whatsapp?: string;
+    instagram?: string;
+    tiktok?: string;
+    twitter?: string;
+    facebook?: string;
+  };
 }
 
 export const defaultShowcaseContent: ShowcaseContent = {
+  socialLinks: {
+    whatsapp: 'https://wa.me/2348000000000',
+    instagram: 'https://instagram.com/dofitwears',
+    tiktok: 'https://tiktok.com/@dofitwears',
+    twitter: 'https://x.com/dofitwears',
+    facebook: '',
+  },
   dofitHero: {
     mainImage: '/images/dofit-wears/2-Piece Biker Short Set.png',
     floatingImage: '/images/dofit-wears/Trim Tank Top.png',

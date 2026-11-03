@@ -10,7 +10,7 @@ export default function AdminContentCmsPage() {
   const [saving, setSaving] = useState(false);
   const [savedToast, setSavedToast] = useState(false);
   const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'dofit' | 'asa'>('dofit');
+  const [activeTab, setActiveTab] = useState<'dofit' | 'asa' | 'social'>('dofit');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const uploadCallbackRef = useRef<((url: string) => void) | null>(null);
@@ -173,6 +173,21 @@ export default function AdminContentCmsPage() {
           }}
         >
           🎨 Àṣà by Dofit (/asa Landing)
+        </button>
+        <button
+          onClick={() => setActiveTab('social')}
+          style={{
+            padding: '10px 22px',
+            borderRadius: '10px',
+            border: `1px solid ${activeTab === 'social' ? '#22C55E' : 'rgba(255,255,255,0.1)'}`,
+            background: activeTab === 'social' ? 'rgba(34,197,94,0.2)' : 'rgba(255,255,255,0.04)',
+            color: activeTab === 'social' ? '#22C55E' : '#fff',
+            fontWeight: 700,
+            fontSize: '13.5px',
+            cursor: 'pointer',
+          }}
+        >
+          📱 Social Media & Handles
         </button>
       </div>
 
@@ -371,6 +386,118 @@ export default function AdminContentCmsPage() {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 3. SOCIAL MEDIA & HANDLES TAB */}
+      {/* ======================================================== */}
+      {activeTab === 'social' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+          <div className={styles.productForm} style={{ maxWidth: '700px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#fff', marginBottom: '8px' }}>
+              Official Social Media & Contact Links
+            </h3>
+            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', marginBottom: '24px' }}>
+              These handles and links dynamically appear across all customer footers on both the main store and the Àṣà brand page.
+            </p>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#22C55E', marginBottom: '6px' }}>
+                  💬 WhatsApp Phone / Direct Link
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. +2348123456789 or https://wa.me/2348123456789"
+                  value={showcase.socialLinks?.whatsapp || ''}
+                  onChange={(e) =>
+                    setShowcase((prev) => ({
+                      ...prev,
+                      socialLinks: { ...prev.socialLinks, whatsapp: e.target.value },
+                    }))
+                  }
+                  style={{ width: '100%', background: '#12121A', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '12px 14px', color: '#fff', fontSize: '13.5px' }}
+                />
+                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.35)', marginTop: '4px', display: 'block' }}>
+                  Customers can tap this in the footer to directly chat with customer care on WhatsApp.
+                </span>
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#E1306C', marginBottom: '6px' }}>
+                  📸 Instagram Profile URL
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://instagram.com/dofitwears"
+                  value={showcase.socialLinks?.instagram || ''}
+                  onChange={(e) =>
+                    setShowcase((prev) => ({
+                      ...prev,
+                      socialLinks: { ...prev.socialLinks, instagram: e.target.value },
+                    }))
+                  }
+                  style={{ width: '100%', background: '#12121A', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '12px 14px', color: '#fff', fontSize: '13.5px' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#00F2FE', marginBottom: '6px' }}>
+                  🎵 TikTok Profile URL
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://tiktok.com/@dofitwears"
+                  value={showcase.socialLinks?.tiktok || ''}
+                  onChange={(e) =>
+                    setShowcase((prev) => ({
+                      ...prev,
+                      socialLinks: { ...prev.socialLinks, tiktok: e.target.value },
+                    }))
+                  }
+                  style={{ width: '100%', background: '#12121A', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '12px 14px', color: '#fff', fontSize: '13.5px' }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 700, color: '#FFFFFF', marginBottom: '6px' }}>
+                  ✖️ X (Twitter) Profile URL
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://x.com/dofitwears"
+                  value={showcase.socialLinks?.twitter || ''}
+                  onChange={(e) =>
+                    setShowcase((prev) => ({
+                      ...prev,
+                      socialLinks: { ...prev.socialLinks, twitter: e.target.value },
+                    }))
+                  }
+                  style={{ width: '100%', background: '#12121A', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '8px', padding: '12px 14px', color: '#fff', fontSize: '13.5px' }}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginTop: '24px' }}>
+              <button
+                onClick={handleSaveAll}
+                disabled={saving}
+                style={{
+                  background: '#22C55E',
+                  border: 'none',
+                  color: '#000000',
+                  padding: '12px 28px',
+                  borderRadius: '10px',
+                  fontSize: '13.5px',
+                  fontWeight: 800,
+                  cursor: 'pointer',
+                }}
+              >
+                {saving ? '⏳ Saving...' : '💾 Save Social Handles'}
+              </button>
             </div>
           </div>
         </div>
