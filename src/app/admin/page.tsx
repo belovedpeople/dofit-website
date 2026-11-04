@@ -150,15 +150,14 @@ export default function AdminDashboard() {
                     </td>
                     <td>
                       <span
-                        className={`${styles.statusTag} ${
-                          ord.status === 'Pending'
+                        className={`${styles.statusTag} ${ord.status === 'Pending'
                             ? styles.statusPending
                             : ord.status === 'Processing'
-                            ? styles.statusProcessing
-                            : ord.status === 'Dispatched'
-                            ? styles.statusDispatched
-                            : styles.statusDelivered
-                        }`}
+                              ? styles.statusProcessing
+                              : ord.status === 'Dispatched'
+                                ? styles.statusDispatched
+                                : styles.statusDelivered
+                          }`}
                       >
                         ● {ord.status}
                       </span>
