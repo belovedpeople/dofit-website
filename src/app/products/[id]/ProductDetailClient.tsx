@@ -531,6 +531,20 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                     <p>
                       <strong>International:</strong> DHL Express available on WhatsApp inquiry.
                     </p>
+                    <p style={{ marginTop: '12px' }}>
+                      <Link
+                        href="/shipping-returns"
+                        target="_blank"
+                        style={{
+                          color: isAsa ? 'var(--asa-gold)' : 'var(--pink)',
+                          fontSize: '12.5px',
+                          textDecoration: 'underline',
+                          fontWeight: 600,
+                        }}
+                      >
+                        View Full Shipping &amp; 7-Day Size Exchange Policy →
+                      </Link>
+                    </p>
                   </div>
                 )}
               </div>

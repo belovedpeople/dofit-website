@@ -1,6 +1,8 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import styles from './Footer.module.css';
 import NewsletterForm from './NewsletterForm';
+import { InstagramIcon, TwitterXIcon, TikTokIcon } from './shared/SocialIcons';
 
 export default function Footer() {
   return (
@@ -53,12 +55,11 @@ export default function Footer() {
         {/* Info links */}
         <div className={styles.col}>
           <h4 className={`${styles.colHead} serif`}>Company</h4>
-          <a href="#story" id="footer-story">Our Story</a>
-          <a href="#" id="footer-contact">Contact Us</a>
-          <a href="#" id="footer-careers">Careers</a>
-          <a href="#" id="footer-faq">FAQ</a>
-          <a href="#" id="footer-returns">Returns Policy</a>
-          <a href="#" id="footer-shipping">Shipping Info</a>
+          <Link href="/about" id="footer-story">Our Story</Link>
+          <a href="https://wa.me/2349016946854" target="_blank" rel="noopener noreferrer" id="footer-contact">Contact Us</a>
+          <Link href="/about" id="footer-faq">FAQ &amp; Heritage</Link>
+          <Link href="/shipping-returns" id="footer-returns">Returns Policy</Link>
+          <Link href="/shipping-returns" id="footer-shipping">Shipping Info</Link>
         </div>
 
         {/* Newsletter */}
@@ -77,9 +78,10 @@ export default function Footer() {
       <div className={`${styles.bottom} wrap`}>
         <p>© 2026 Dofit Wears. All rights reserved.</p>
         <div className={styles.bottomLinks}>
-          <a href="#" id="footer-privacy">Privacy Policy</a>
-          <a href="#" id="footer-terms">Terms of Use</a>
-          <a href="#" id="footer-cookies">Cookies</a>
+          <Link href="/privacy" id="footer-privacy">Privacy Policy</Link>
+          <Link href="/terms" id="footer-terms">Terms of Use</Link>
+          <Link href="/cookies" id="footer-cookies">Cookies</Link>
+          <Link href="/shipping-returns" id="footer-shipping-policy">Shipping &amp; Returns</Link>
         </div>
         <p className={styles.credit}>Made with ♥ in Lagos</p>
       </div>

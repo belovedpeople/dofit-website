@@ -4,16 +4,17 @@ import Link from 'next/link';
 import styles from './DofitFooter.module.css';
 import NewsletterForm from '../NewsletterForm';
 import { useShowcaseContent } from '@/hooks/useShowcaseContent';
+import { getSocialIcon } from '@/components/shared/SocialIcons';
 
 export default function DofitFooter() {
   const { showcase } = useShowcaseContent();
   const socials = showcase.socialLinks || {};
 
   const socialList = [
-    { name: 'Instagram', label: 'I', url: socials.instagram || 'https://instagram.com/dofitwears' },
-    { name: 'TikTok', label: 'T', url: socials.tiktok || 'https://tiktok.com/@dofitwears' },
-    { name: 'Twitter', label: 'X', url: socials.twitter || 'https://x.com/dofitwears' },
-    ...(socials.whatsapp ? [{ name: 'WhatsApp', label: 'W', url: socials.whatsapp.startsWith('http') ? socials.whatsapp : `https://wa.me/${socials.whatsapp.replace(/[^0-9]/g, '')}` }] : []),
+    { name: 'Instagram', icon: getSocialIcon('instagram', 17), url: socials.instagram || 'https://instagram.com/dofitwears' },
+    { name: 'TikTok', icon: getSocialIcon('tiktok', 17), url: socials.tiktok || 'https://tiktok.com/@dofitwears' },
+    { name: 'Twitter', icon: getSocialIcon('twitter', 16), url: socials.twitter || 'https://x.com/dofitwears' },
+    ...(socials.whatsapp ? [{ name: 'WhatsApp', icon: getSocialIcon('whatsapp', 17), url: socials.whatsapp.startsWith('http') ? socials.whatsapp : `https://wa.me/${socials.whatsapp.replace(/[^0-9]/g, '')}` }] : []),
   ];
 
   return (
@@ -38,9 +39,10 @@ export default function DofitFooter() {
                 rel="noopener noreferrer"
                 className={styles.social}
                 aria-label={s.name}
+                title={s.name}
                 id={`footer-${s.name.toLowerCase()}`}
               >
-                <span className={styles.socialLabel}>{s.label}</span>
+                {s.icon}
               </a>
             ))}
           </div>
@@ -60,7 +62,7 @@ export default function DofitFooter() {
         <div className={styles.col}>
           <h4 className={`${styles.colH} display`}>Company</h4>
           <Link href="/about" className={styles.colLink} id="footer-story">Our Story & Heritage</Link>
-          <Link href="/shop" className={styles.colLink} id="footer-shipping">Shipping & Returns</Link>
+          <Link href="/shipping-returns" className={styles.colLink} id="footer-shipping">Shipping & Returns</Link>
           <Link href="/about" className={styles.colLink} id="footer-contact">Craftsmanship & FAQ</Link>
         </div>
 
@@ -76,9 +78,9 @@ export default function DofitFooter() {
       <div className={`${styles.bottom} wrap`}>
         <p className={styles.copy}>© 2026 Dofit Wears. All rights reserved.</p>
         <div className={styles.bottomLinks}>
-          <a href="#" id="footer-privacy">Privacy</a>
-          <a href="#" id="footer-terms">Terms</a>
-          <a href="#" id="footer-cookies">Cookies</a>
+          <Link href="/privacy" id="footer-privacy">Privacy</Link>
+          <Link href="/terms" id="footer-terms">Terms</Link>
+          <Link href="/cookies" id="footer-cookies">Cookies</Link>
         </div>
         <p className={styles.madeIn}>Made with ♥ in Lagos</p>
       </div>

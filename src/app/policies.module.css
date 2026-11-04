@@ -1,0 +1,199 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--black, #08080C);
+  color: var(--white, #FFFFFF);
+}
+
+.main {
+  flex: 1;
+  padding-top: 130px;
+  padding-bottom: 90px;
+}
+
+.headerWrap {
+  margin-bottom: 48px;
+  max-width: 840px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--pink, #FF1E6A);
+  margin-bottom: 12px;
+}
+
+.title {
+  font-size: clamp(32px, 4vw, 54px);
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  margin-bottom: 14px;
+}
+
+.lastUpdated {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.contentCard {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 42px 48px;
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 920px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.goldSectionTitle {
+  color: var(--asa-gold, #E8A020);
+}
+
+.paragraph {
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 4px;
+  margin: 0;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.bullet {
+  color: var(--pink, #FF1E6A);
+  font-size: 14px;
+  margin-top: 2px;
+}
+
+.bulletGold {
+  color: var(--asa-gold, #E8A020);
+}
+
+.highlightBox {
+  background: rgba(255, 30, 106, 0.06);
+  border: 1px solid rgba(255, 30, 106, 0.2);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.highlightBoxGold {
+  background: rgba(232, 160, 32, 0.06);
+  border-color: rgba(232, 160, 32, 0.25);
+}
+
+.highlightTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.tableWrap {
+  overflow-x: auto;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.policyTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: left;
+}
+
+.policyTable th {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 14px 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.policyTable td {
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.contactStrip {
+  margin-top: 40px;
+  background: radial-gradient(circle at center, rgba(255, 30, 106, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+  border: 1px solid rgba(255, 30, 106, 0.25);
+  border-radius: 16px;
+  padding: 32px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  max-width: 920px;
+}
+
+.contactTitle {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.contactDesc {
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+@media (max-width: 768px) {
+  .main {
+    padding-top: 100px;
+    padding-bottom: 60px;
+  }
+
+  .contentCard {
+    padding: 24px 20px;
+    border-radius: 12px;
+    gap: 28px;
+  }
+
+  .contactStrip {
+    padding: 24px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

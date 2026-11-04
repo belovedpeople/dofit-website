@@ -3,17 +3,22 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Order } from '@/data/orders';
 import { products } from '@/data/products';
+import { Subscriber } from '@/data/subscribers';
 import styles from './admin.module.css';
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/orders')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.orders) setOrders(data.orders);
+    Promise.all([
+      fetch('/api/orders').then((res) => res.json()),
+      fetch('/api/newsletter').then((res) => res.json()).catch(() => ({ subscribers: [] })),
+    ])
+      .then(([ordersData, subsData]) => {
+        if (ordersData.orders) setOrders(ordersData.orders);
+        if (subsData.subscribers) setSubscribers(subsData.subscribers);
         setLoading(false);
       })
       .catch((err) => {
@@ -63,6 +68,14 @@ export default function AdminDashboard() {
           <span className={styles.kpiLabel}>Pending Fulfillment</span>
           <div className={styles.kpiValue}>{pendingOrders.length}</div>
           <span className={styles.kpiSub}>Awaiting confirmation / dispatch</span>
+        </div>
+
+        <div className={styles.kpiCard}>
+          <span className={styles.kpiLabel}>VIP Drop Subscribers</span>
+          <div className={styles.kpiValue} style={{ color: '#38BDF8' }}>
+            {subscribers.length}
+          </div>
+          <span className={styles.kpiSub}>Stay Plugged In email leads</span>
         </div>
       </div>
 
@@ -161,6 +174,62 @@ export default function AdminDashboard() {
                   </tr>
                 );
               })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Latest VIP Drop Subscribers Card */}
+      <div className={styles.tableCard}>
+        <div className={styles.tableHeaderRow}>
+          <div>
+            <h2 className={styles.tableTitle}>Stay Plugged In — Recent VIP Signups</h2>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)' }}>
+              Emails collected from website footers and drop notifications ({subscribers.length} total)
+            </p>
+          </div>
+          <Link href="/admin/subscribers" className={styles.actionBtn}>
+            Manage All Subscribers →
+          </Link>
+        </div>
+
+        <div style={{ overflowX: 'auto' }}>
+          <table className={styles.dataTable}>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Subscription Source</th>
+                <th>Joined</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {subscribers.slice(0, 4).map((sub) => (
+                <tr key={sub.id}>
+                  <td>
+                    <strong style={{ color: '#fff' }}>{sub.email}</strong>
+                  </td>
+                  <td>
+                    <span
+                      style={{
+                        background: 'rgba(255, 30, 106, 0.12)',
+                        color: 'var(--pink)',
+                        padding: '2px 8px',
+                        borderRadius: '4px',
+                        fontSize: '11px',
+                      }}
+                    >
+                      {sub.source}
+                    </span>
+                  </td>
+                  <td>{new Date(sub.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <span className={`${styles.statusTag} ${styles.statusDispatched}`}>
+                      ● Active
+                    </span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

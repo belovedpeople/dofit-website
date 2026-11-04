@@ -13,6 +13,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/products', label: 'Products & Stock', icon: '👗' },
     { href: '/admin/analytics', label: 'Analytics', icon: '📈' },
     { href: '/admin/vouchers', label: 'Vouchers & Promos', icon: '🎟️' },
+    { href: '/admin/subscribers', label: 'Subscribers (VIP)', icon: '📬' },
     { href: '/admin/content-cms', label: 'Content CMS', icon: '🖊' },
   ];
 

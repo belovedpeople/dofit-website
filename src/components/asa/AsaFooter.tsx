@@ -5,16 +5,17 @@ import { AdireElekoPattern, AdireTeethDivider } from './patterns/YorubaPatterns'
 import styles from './AsaFooter.module.css';
 import NewsletterForm from '../NewsletterForm';
 import { useShowcaseContent } from '@/hooks/useShowcaseContent';
+import { getSocialIcon } from '@/components/shared/SocialIcons';
 
 export default function AsaFooter() {
   const { showcase } = useShowcaseContent();
   const socials = showcase.socialLinks || {};
 
   const socialList = [
-    { char: 'I', label: 'Instagram', url: socials.instagram || 'https://instagram.com/dofitwears' },
-    { char: 'T', label: 'TikTok', url: socials.tiktok || 'https://tiktok.com/@dofitwears' },
-    { char: 'X', label: 'Twitter', url: socials.twitter || 'https://x.com/dofitwears' },
-    ...(socials.whatsapp ? [{ char: 'W', label: 'WhatsApp', url: socials.whatsapp.startsWith('http') ? socials.whatsapp : `https://wa.me/${socials.whatsapp.replace(/[^0-9]/g, '')}` }] : []),
+    { name: 'Instagram', icon: getSocialIcon('instagram', 17), url: socials.instagram || 'https://instagram.com/dofitwears' },
+    { name: 'TikTok', icon: getSocialIcon('tiktok', 17), url: socials.tiktok || 'https://tiktok.com/@dofitwears' },
+    { name: 'Twitter', icon: getSocialIcon('twitter', 16), url: socials.twitter || 'https://x.com/dofitwears' },
+    ...(socials.whatsapp ? [{ name: 'WhatsApp', icon: getSocialIcon('whatsapp', 17), url: socials.whatsapp.startsWith('http') ? socials.whatsapp : `https://wa.me/${socials.whatsapp.replace(/[^0-9]/g, '')}` }] : []),
   ];
 
   return (
@@ -43,10 +44,11 @@ export default function AsaFooter() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.social}
-                aria-label={s.label}
+                aria-label={s.name}
+                title={s.name}
                 id={`asa-footer-social-${i}`}
               >
-                <span className={`${styles.socialChar} asa-body`}>{s.char}</span>
+                {s.icon}
               </a>
             ))}
           </div>
@@ -57,6 +59,7 @@ export default function AsaFooter() {
           <Link href="/shop?brand=asa" className={`${styles.colLink} asa-body`}>All Cultural Pieces</Link>
           <Link href="/asa#asa-products" className={`${styles.colLink} asa-body`}>New Drops</Link>
           <Link href="/asa#asa-gallery" className={`${styles.colLink} asa-body`}>Lookbook &amp; Editorial</Link>
+          <Link href="/shipping-returns" className={`${styles.colLink} asa-body`}>Shipping &amp; Returns</Link>
         </div>
 
         <div className={styles.col}>
@@ -75,6 +78,12 @@ export default function AsaFooter() {
 
       <div className={`${styles.bottom} wrap`}>
         <p className={`${styles.copy} asa-body`}>© 2026 Àṣà by Dofit. A Dofit Wears Brand.</p>
+        <div style={{ display: 'flex', gap: '20px' }}>
+          <Link href="/privacy" className="asa-body" style={{ fontSize: '12px', color: 'rgba(232, 160, 32, 0.5)' }}>Privacy</Link>
+          <Link href="/terms" className="asa-body" style={{ fontSize: '12px', color: 'rgba(232, 160, 32, 0.5)' }}>Terms</Link>
+          <Link href="/cookies" className="asa-body" style={{ fontSize: '12px', color: 'rgba(232, 160, 32, 0.5)' }}>Cookies</Link>
+          <Link href="/shipping-returns" className="asa-body" style={{ fontSize: '12px', color: 'rgba(232, 160, 32, 0.5)' }}>Shipping</Link>
+        </div>
         <p className={`${styles.madeIn} asa-body`}>Crafted with pride in Lagos ♥</p>
       </div>
     </footer>
