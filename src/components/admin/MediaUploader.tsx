@@ -70,8 +70,9 @@ export default function MediaUploader({
           );
         }
 
+        const safeFileName = originalFile.name.replace(/\.[^.]+$/, '') + '.jpg';
         const formData = new FormData();
-        formData.append('files', processedFile);
+        formData.append('files', processedFile, safeFileName);
         if (productId) formData.append('productId', productId);
 
         const res = await fetch('/api/upload', { method: 'POST', body: formData });
@@ -105,7 +106,11 @@ export default function MediaUploader({
         }
       } catch (err: any) {
         console.error(`Upload error on ${originalFile.name}:`, err);
-        errors.push(err?.message || `Failed to upload ${originalFile.name}`);
+        let errMsg = err?.message || `Failed to upload ${originalFile.name}`;
+        if (errMsg.toLowerCase().includes('load failed')) {
+          errMsg = `Mobile network dropped during "${originalFile.name}". Please re-select the file to retry.`;
+        }
+        errors.push(errMsg);
       }
     }
 

@@ -25,11 +25,12 @@ export async function POST(request: NextRequest) {
     for (const file of files) {
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const isVideo = file.type.startsWith('video');
+      const isVideo = Boolean(file.type?.startsWith('video') || /\.(mp4|mov|webm|avi)$/i.test(file.name));
+      const mime = file.type || (isVideo ? 'video/mp4' : 'image/jpeg');
 
       // Upload to Cloudinary as a base64 data URI
       const base64 = buffer.toString('base64');
-      const dataUri = `data:${file.type};base64,${base64}`;
+      const dataUri = `data:${mime};base64,${base64}`;
 
       const result = await cloudinary.uploader.upload(dataUri, {
         folder: `dofit/products/${productId}`,
