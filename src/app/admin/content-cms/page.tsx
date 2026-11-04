@@ -10,6 +10,7 @@ export default function AdminContentCmsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savedToast, setSavedToast] = useState(false);
+  const [toastMsg, setToastMsg] = useState('✓ Showcase updated live on landing pages!');
   const [uploadingTarget, setUploadingTarget] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'dofit' | 'asa' | 'social'>('dofit');
 
@@ -17,7 +18,7 @@ export default function AdminContentCmsPage() {
   const uploadCallbackRef = useRef<((url: string) => void) | null>(null);
 
   useEffect(() => {
-    fetch('/api/showcase')
+    fetch(`/api/showcase?t=${Date.now()}`)
       .then((r) => r.json())
       .then((d) => {
         if (d.showcase) setShowcase(d.showcase);
@@ -26,9 +27,41 @@ export default function AdminContentCmsPage() {
       .catch(() => setLoading(false));
   }, []);
 
-  // Trigger file upload for any image slot
-  const triggerImageUpload = (callback: (url: string) => void) => {
-    uploadCallbackRef.current = callback;
+  const saveShowcaseData = async (dataToSave: ShowcaseContent, label?: string) => {
+    setSaving(true);
+    try {
+      const res = await fetch('/api/showcase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dataToSave),
+      });
+      if (res.ok) {
+        setToastMsg(`✓ ${label || 'Showcase'} published live to landing pages!`);
+        setSavedToast(true);
+        setTimeout(() => setSavedToast(false), 3500);
+      } else {
+        alert('Failed to save showcase changes to database.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error saving changes to database.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Trigger file upload for any image slot with auto-save
+  const triggerImageUpload = (
+    updater: (url: string, current: ShowcaseContent) => ShowcaseContent,
+    label = 'Hero image'
+  ) => {
+    uploadCallbackRef.current = (url: string) => {
+      setShowcase((prev) => {
+        const next = updater(url, prev);
+        saveShowcaseData(next, label);
+        return next;
+      });
+    };
     fileInputRef.current?.click();
   };
 
@@ -80,27 +113,7 @@ export default function AdminContentCmsPage() {
     }
   };
 
-  const handleSaveAll = async () => {
-    setSaving(true);
-    try {
-      const res = await fetch('/api/showcase', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(showcase),
-      });
-      if (res.ok) {
-        setSavedToast(true);
-        setTimeout(() => setSavedToast(false), 3000);
-      } else {
-        alert('Failed to save showcase changes');
-      }
-    } catch (err) {
-      console.error(err);
-      alert('Error saving changes');
-    } finally {
-      setSaving(false);
-    }
-  };
+  const handleSaveAll = () => saveShowcaseData(showcase, 'Showcase settings');
 
   if (loading) {
     return <div style={{ padding: '60px', color: 'rgba(255,255,255,0.4)', textAlign: 'center' }}>Loading Showcase CMS...</div>;
@@ -133,9 +146,40 @@ export default function AdminContentCmsPage() {
             zIndex: 9999,
           }}
         >
-          ✓ Showcase updated live on both landing pages!
+          {toastMsg}
         </div>
       )}
+
+      {/* Floating Save Button on mobile so it's always accessible */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '72px',
+          right: '16px',
+          zIndex: 1500,
+        }}
+      >
+        <button
+          onClick={handleSaveAll}
+          disabled={saving}
+          style={{
+            background: 'linear-gradient(135deg, #FF1E6A, #FF6B9D)',
+            border: 'none',
+            color: '#FFFFFF',
+            padding: '12px 20px',
+            borderRadius: '999px',
+            fontSize: '13px',
+            fontWeight: 800,
+            cursor: 'pointer',
+            boxShadow: '0 8px 30px rgba(255,30,106,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+          }}
+        >
+          {saving ? '⏳ Saving...' : '💾 Publish Live'}
+        </button>
+      </div>
 
       {/* Top action row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '28px', flexWrap: 'wrap', gap: '16px' }}>
@@ -232,7 +276,12 @@ export default function AdminContentCmsPage() {
                   <Image src={showcase.dofitHero.mainImage} alt="Dofit Hero" fill style={{ objectFit: 'cover' }} unoptimized />
                 </div>
                 <button
-                  onClick={() => triggerImageUpload((url) => setShowcase((prev) => ({ ...prev, dofitHero: { ...prev.dofitHero, mainImage: url } })))}
+                  onClick={() =>
+                    triggerImageUpload(
+                      (url, prev) => ({ ...prev, dofitHero: { ...prev.dofitHero, mainImage: url } }),
+                      'Dofit Hero Main Image'
+                    )
+                  }
                   className={styles.actionBtn}
                   style={{ width: '100%', justifyContent: 'center' }}
                 >
@@ -267,7 +316,12 @@ export default function AdminContentCmsPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => triggerImageUpload((url) => setShowcase((prev) => ({ ...prev, dofitHero: { ...prev.dofitHero, floatingImage: url } })))}
+                  onClick={() =>
+                    triggerImageUpload(
+                      (url, prev) => ({ ...prev, dofitHero: { ...prev.dofitHero, floatingImage: url } }),
+                      'Hero Floating Drop Image'
+                    )
+                  }
                   className={styles.actionBtn}
                   style={{ width: '100%', justifyContent: 'center' }}
                 >
@@ -290,13 +344,16 @@ export default function AdminContentCmsPage() {
                     <Image src={item.src} alt={item.alt} fill style={{ objectFit: 'cover' }} unoptimized />
                   </div>
                   <button
-                    onClick={() => triggerImageUpload((url) => {
-                      setShowcase((prev) => {
-                        const copy = [...prev.dofitInsta];
-                        copy[idx] = { ...copy[idx], src: url };
-                        return { ...prev, dofitInsta: copy };
-                      });
-                    })}
+                    onClick={() =>
+                      triggerImageUpload(
+                        (url, prev) => {
+                          const copy = [...prev.dofitInsta];
+                          copy[idx] = { ...copy[idx], src: url };
+                          return { ...prev, dofitInsta: copy };
+                        },
+                        `Community Photo #${idx + 1}`
+                      )
+                    }
                     className={styles.actionBtn}
                     style={{ fontSize: '11px', width: '100%', padding: '6px 8px', justifyContent: 'center' }}
                   >
@@ -327,7 +384,12 @@ export default function AdminContentCmsPage() {
                   <Image src={showcase.asaHero.mainImage} alt="Àṣà Hero" fill style={{ objectFit: 'cover' }} unoptimized />
                 </div>
                 <button
-                  onClick={() => triggerImageUpload((url) => setShowcase((prev) => ({ ...prev, asaHero: { ...prev.asaHero, mainImage: url } })))}
+                  onClick={() =>
+                    triggerImageUpload(
+                      (url, prev) => ({ ...prev, asaHero: { ...prev.asaHero, mainImage: url } }),
+                      'Àṣà Hero Image'
+                    )
+                  }
                   className={styles.actionBtn}
                   style={{ width: '100%', justifyContent: 'center' }}
                 >
@@ -344,7 +406,12 @@ export default function AdminContentCmsPage() {
                   <Image src={showcase.asaStory.mainImage} alt="Àṣà Story" fill style={{ objectFit: 'cover' }} unoptimized />
                 </div>
                 <button
-                  onClick={() => triggerImageUpload((url) => setShowcase((prev) => ({ ...prev, asaStory: { ...prev.asaStory, mainImage: url } })))}
+                  onClick={() =>
+                    triggerImageUpload(
+                      (url, prev) => ({ ...prev, asaStory: { ...prev.asaStory, mainImage: url } }),
+                      'Àṣà Story Image'
+                    )
+                  }
                   className={styles.actionBtn}
                   style={{ width: '100%', justifyContent: 'center' }}
                 >
@@ -397,11 +464,16 @@ export default function AdminContentCmsPage() {
                   </div>
 
                   <button
-                    onClick={() => triggerImageUpload((url) => {
-                      const copy = [...showcase.asaGallery];
-                      copy[idx] = { ...copy[idx], image: url };
-                      setShowcase((prev) => ({ ...prev, asaGallery: copy }));
-                    })}
+                    onClick={() =>
+                      triggerImageUpload(
+                        (url, prev) => {
+                          const copy = [...prev.asaGallery];
+                          copy[idx] = { ...copy[idx], image: url };
+                          return { ...prev, asaGallery: copy };
+                        },
+                        `Lookbook Look #${idx + 1}`
+                      )
+                    }
                     className={styles.actionBtn}
                     style={{ width: '100%', justifyContent: 'center' }}
                   >

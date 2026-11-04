@@ -116,6 +116,7 @@ export default function DofitHero() {
           className={styles.img}
           priority
           sizes="100vw"
+          unoptimized={Boolean(showcase.dofitHero?.mainImage?.startsWith('http'))}
         />
         {/* Pink gradient overlay */}
         <div className={styles.overlay} />
@@ -193,6 +194,7 @@ export default function DofitHero() {
             fill
             className={styles.floatImgInner}
             sizes="140px"
+            unoptimized={Boolean(showcase.dofitHero?.floatingImage?.startsWith('http'))}
           />
         </div>
         <div className={styles.floatInfo}>

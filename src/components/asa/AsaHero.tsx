@@ -96,6 +96,7 @@ export default function AsaHero() {
           className={styles.img}
           priority
           sizes="100vw"
+          unoptimized={Boolean(showcase.asaHero?.mainImage?.startsWith('http'))}
         />
         <div className={styles.overlay} />
       </div>

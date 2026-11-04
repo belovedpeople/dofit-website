@@ -14,25 +14,36 @@ export function useShowcaseContent() {
   const [showcase, setShowcase] = useState<ShowcaseContent>(cachedShowcase);
   const [loading, setLoading] = useState(false);
 
+  const refresh = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/showcase?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store',
+          Pragma: 'no-cache',
+        },
+      });
+      const data = await res.json();
+      if (data?.showcase) {
+        notify(data.showcase);
+      }
+    } catch (err) {
+      console.error('Failed to fetch showcase content:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     subscribers.push(setShowcase);
-
-    setLoading(true);
-    fetch('/api/showcase')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.showcase) {
-          notify(data.showcase);
-        }
-      })
-      .catch((err) => console.error('Failed to fetch showcase content:', err))
-      .finally(() => setLoading(false));
+    refresh();
 
     return () => {
       subscribers = subscribers.filter((cb) => cb !== setShowcase);
     };
   }, []);
 
-  return { showcase, loading };
+  return { showcase, loading, refresh };
 }
 
