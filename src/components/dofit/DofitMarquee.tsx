@@ -1,7 +1,7 @@
 import styles from './DofitMarquee.module.css';
 
 const items1 = ['Premium Activewear', '✦', 'Dofit Wears', '✦', 'New Drop 2026', '✦', 'Built to Perform', '✦', 'Made to Be Seen', '✦', 'Shop Now', '✦', 'Premium Activewear', '✦', 'Dofit Wears', '✦', 'New Drop 2026', '✦', 'Built to Perform', '✦', 'Made to Be Seen', '✦', 'Shop Now', '✦'];
-const items2 = ['Free Shipping ₦50K+', '★', 'Body Inclusive', '★', 'Made in Lagos', '★', 'Performance Fabric', '★', 'Àṣà by Dofit', '★', 'New Collection', '★', 'Free Shipping ₦50K+', '★', 'Body Inclusive', '★', 'Made in Lagos', '★', 'Performance Fabric', '★', 'Àṣà by Dofit', '★', 'New Collection', '★'];
+const items2 = ['Fast Nationwide Dispatch', '★', 'Body Inclusive', '★', 'Made in Lagos', '★', 'Performance Fabric', '★', 'Àṣà by Dofit', '★', 'New Collection', '★', 'Fast Nationwide Dispatch', '★', 'Body Inclusive', '★', 'Made in Lagos', '★', 'Performance Fabric', '★', 'Àṣà by Dofit', '★', 'New Collection', '★'];
 
 export default function DofitMarquee() {
   return (

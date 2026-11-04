@@ -20,7 +20,7 @@ export const defaultSettings: SiteSettings = {
   ordersPausedMessage: 'Order intake is momentarily paused for live dispatch processing. We will resume shortly!',
   whatsappNumber: '2349016946854',
   announcementEnabled: false,
-  announcementText: '⚡ Free Express Lagos Delivery on orders above ₦50,000 · Same-Day Dispatch Live',
+  announcementText: '⚡ New Drops Live · Fast Tracked Nationwide Dispatch Available',
   announcementColor: 'pink',
   updatedAt: new Date().toISOString(),
 };

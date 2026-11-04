@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Order } from '@/data/orders';
+import OrderReceiptModal from '@/components/admin/OrderReceiptModal';
 import styles from '../admin.module.css';
 
 export default function AdminOrdersPage() {
@@ -9,6 +10,7 @@ export default function AdminOrdersPage() {
   const [brandFilter, setBrandFilter] = useState<string>('All');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+  const [receiptOrder, setReceiptOrder] = useState<Order | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   const fetchOrders = () => {
@@ -263,6 +265,15 @@ export default function AdminOrdersPage() {
                             </button>
                             <button
                               type="button"
+                              onClick={() => setReceiptOrder(ord)}
+                              className={styles.actionBtn}
+                              style={{ padding: '6px 10px', fontSize: '11.5px', background: 'rgba(255,255,255,0.08)' }}
+                              title="Generate PDF or Image Receipt"
+                            >
+                              🧾 Receipt
+                            </button>
+                            <button
+                              type="button"
                               onClick={() => setOrderToDelete(ord)}
                               style={{
                                 background: 'rgba(239, 68, 68, 0.12)',
@@ -387,6 +398,16 @@ export default function AdminOrdersPage() {
                         style={{ minHeight: '40px', padding: '0 12px', fontSize: '12px' }}
                       >
                         View
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setReceiptOrder(ord)}
+                        className={styles.actionBtn}
+                        style={{ minHeight: '40px', padding: '0 10px', fontSize: '12px', background: 'rgba(255,255,255,0.08)' }}
+                        title="Generate Receipt"
+                      >
+                        🧾 Receipt
                       </button>
 
                       <button
@@ -595,6 +616,16 @@ export default function AdminOrdersPage() {
               </a>
               <button
                 type="button"
+                onClick={() => setReceiptOrder(selectedOrder)}
+                className={styles.actionBtn}
+                style={{ padding: '12px 18px', background: 'rgba(255,30,106,0.15)', borderColor: 'var(--pink)', color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}
+                title="Generate PDF or Image Receipt"
+              >
+                <span>🧾</span>
+                <span>Generate Receipt</span>
+              </button>
+              <button
+                type="button"
                 onClick={() => setOrderToDelete(selectedOrder)}
                 style={{
                   background: 'rgba(239, 68, 68, 0.12)',
@@ -701,6 +732,12 @@ export default function AdminOrdersPage() {
           </div>
         </div>
       )}
+
+      {/* Order Receipt Modal (PDF / Image / WhatsApp) */}
+      <OrderReceiptModal
+        order={receiptOrder}
+        onClose={() => setReceiptOrder(null)}
+      />
     </div>
   );
 }

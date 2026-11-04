@@ -1,7 +1,7 @@
 import styles from './AnnouncementStrip.module.css';
 
 const messages = [
-  'Free shipping on orders over ₦50,000',
+  'Fast Tracked Nationwide Dispatch',
   '✦',
   'New Àṣà Drop — Now Live',
   '✦',
@@ -15,7 +15,7 @@ const messages = [
   '✦',
   'New Àṣà Drop — Now Live',
   '✦',
-  'Free shipping on orders over ₦50,000',
+  'Fast Tracked Nationwide Dispatch',
   '✦',
   'Premium activewear — built to perform, made to be seen',
   '✦',
