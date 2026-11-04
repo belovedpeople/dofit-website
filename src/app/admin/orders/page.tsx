@@ -8,6 +8,8 @@ export default function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [brandFilter, setBrandFilter] = useState<string>('All');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchOrders = () => {
     fetch('/api/orders')
@@ -34,6 +36,30 @@ export default function AdminOrdersPage() {
       }
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const confirmDeleteOrder = async () => {
+    if (!orderToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/orders?id=${encodeURIComponent(orderToDelete.id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Failed to delete order');
+      }
+
+      setOrders((prev) => prev.filter((o) => o.id !== orderToDelete.id));
+      if (selectedOrder && selectedOrder.id === orderToDelete.id) {
+        setSelectedOrder(null);
+      }
+      setOrderToDelete(null);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error deleting order');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -227,12 +253,32 @@ export default function AdminOrdersPage() {
                           </select>
                         </td>
                         <td>
-                          <button
-                            onClick={() => setSelectedOrder(ord)}
-                            className={styles.actionBtn}
-                          >
-                            Inspect
-                          </button>
+                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                            <button
+                              onClick={() => setSelectedOrder(ord)}
+                              className={styles.actionBtn}
+                              style={{ padding: '6px 12px', fontSize: '11.5px' }}
+                            >
+                              Inspect
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setOrderToDelete(ord)}
+                              style={{
+                                background: 'rgba(239, 68, 68, 0.12)',
+                                border: '1px solid rgba(239, 68, 68, 0.28)',
+                                color: '#EF4444',
+                                padding: '6px 10px',
+                                borderRadius: '6px',
+                                fontSize: '11.5px',
+                                fontWeight: 600,
+                                cursor: 'pointer',
+                              }}
+                              title="Delete this order"
+                            >
+                              🗑️
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -341,6 +387,28 @@ export default function AdminOrdersPage() {
                         style={{ minHeight: '40px', padding: '0 12px', fontSize: '12px' }}
                       >
                         View
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setOrderToDelete(ord)}
+                        style={{
+                          background: 'rgba(239, 68, 68, 0.12)',
+                          border: '1px solid rgba(239, 68, 68, 0.28)',
+                          color: '#EF4444',
+                          minHeight: '40px',
+                          minWidth: '40px',
+                          borderRadius: '8px',
+                          fontSize: '14px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                        }}
+                        aria-label="Delete order"
+                        title="Delete order"
+                      >
+                        🗑️
                       </button>
                     </div>
                   </div>
@@ -515,22 +583,119 @@ export default function AdminOrdersPage() {
             </div>
 
             {/* Action buttons */}
-            <div style={{ display: 'flex', gap: '10px' }}>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <a
                 href={`https://wa.me/${selectedOrder.customer.phone.replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 rel="noreferrer"
                 className={`${styles.actionBtn} ${styles.actionBtnWa}`}
-                style={{ flex: 1, justifyContent: 'center', padding: '12px' }}
+                style={{ flex: 1, minWidth: '180px', justifyContent: 'center', padding: '12px' }}
               >
                 💬 Open WhatsApp Chat
               </a>
+              <button
+                type="button"
+                onClick={() => setOrderToDelete(selectedOrder)}
+                style={{
+                  background: 'rgba(239, 68, 68, 0.12)',
+                  border: '1px solid rgba(239, 68, 68, 0.28)',
+                  color: '#EF4444',
+                  padding: '12px 18px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>🗑️</span>
+                <span>Delete Order</span>
+              </button>
               <button
                 onClick={() => setSelectedOrder(null)}
                 className={styles.actionBtn}
                 style={{ padding: '12px 20px' }}
               >
                 Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Order Confirmation Dialog */}
+      {orderToDelete && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.85)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 2000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+          }}
+          onClick={() => !deleting && setOrderToDelete(null)}
+        >
+          <div
+            style={{
+              background: '#14141E',
+              border: '1px solid rgba(239, 68, 68, 0.3)',
+              borderRadius: '16px',
+              padding: '28px 24px',
+              maxWidth: '420px',
+              width: '100%',
+              textAlign: 'center',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(239, 68, 68, 0.15)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ fontSize: '44px', marginBottom: '14px' }}>🗑️</div>
+            <h3 style={{ color: '#FFFFFF', fontSize: '19px', fontWeight: 800, margin: '0 0 8px' }}>
+              Delete Order #{orderToDelete.id}?
+            </h3>
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '13px', lineHeight: 1.5, margin: '0 0 16px' }}>
+              Are you sure you want to delete this order from <strong style={{ color: '#FFFFFF' }}>{orderToDelete.customer.fullName}</strong> for <strong style={{ color: 'var(--pink)' }}>₦{orderToDelete.totalAmount.toLocaleString()}</strong>?
+              <br />
+              <span style={{ color: '#EF4444', fontSize: '12px', display: 'block', marginTop: '6px' }}>
+                ⚠️ This will permanently remove this order from sales and reports.
+              </span>
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => setOrderToDelete(null)}
+                disabled={deleting}
+                className={styles.actionBtn}
+                style={{ minHeight: '44px', justifyContent: 'center' }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteOrder}
+                disabled={deleting}
+                style={{
+                  background: 'linear-gradient(135deg, #EF4444, #DC2626)',
+                  border: 'none',
+                  color: '#FFFFFF',
+                  padding: '10px 18px',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  minHeight: '44px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {deleting ? 'Deleting...' : 'Yes, Delete'}
               </button>
             </div>
           </div>

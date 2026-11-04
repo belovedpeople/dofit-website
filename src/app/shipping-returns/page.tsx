@@ -27,7 +27,7 @@ export default function ShippingReturnsPage() {
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>⚡ 1. Delivery Rates &amp; Timelines</h2>
               <p className={styles.paragraph}>
-                We maintain active fulfillment hubs in Lagos to ensure rapid, dependable door-to-door dispatch. Every package is carefully inspected, packed in branded matte presentation boxes, and tracked until it safely reaches your hands.
+                We maintain active fulfillment hubs in Lagos to ensure rapid, dependable door-to-door dispatch. Every package is carefully inspected, packed in branded matte presentation boxes, and tracked until it safely reaches your hands. Delivery fees are quoted upon inquiry based on your destination and parcel size, with an estimated delivery time of 3 – 7 business days for all orders.
               </p>
 
               <div className={styles.tableWrap}>
@@ -46,12 +46,11 @@ export default function ShippingReturnsPage() {
                         <strong>Lagos (Island &amp; Mainland)</strong>
                       </td>
                       <td>
-                        <strong>₦2,500</strong> flat rate
-                        <div style={{ fontSize: '11.5px', color: '#34d399', marginTop: '3px' }}>
-                          ✓ FREE for orders above ₦50,000
-                        </div>
+                        <strong>Quoted on Inquiry</strong>
                       </td>
-                      <td>Same Day / Within 24 Hours</td>
+                      <td>
+                        <strong>3 – 7 Business Days</strong>
+                      </td>
                       <td>Direct Motorcycle Dispatch</td>
                     </tr>
                     <tr>
@@ -60,9 +59,11 @@ export default function ShippingReturnsPage() {
                         <div style={{ fontSize: '11px', opacity: 0.6 }}>Abuja, Port Harcourt, Ibadan, Asaba, Benin, etc.</div>
                       </td>
                       <td>
-                        <strong>₦5,000</strong> flat rate
+                        <strong>Quoted on Inquiry</strong>
                       </td>
-                      <td>2 – 3 Business Days</td>
+                      <td>
+                        <strong>3 – 7 Business Days</strong>
+                      </td>
                       <td>Verified Freight Logistics (GIGL / Speedaf)</td>
                     </tr>
                     <tr>
@@ -70,17 +71,23 @@ export default function ShippingReturnsPage() {
                         <strong>Interstate (Outlying Areas)</strong>
                       </td>
                       <td>
-                        <strong>₦6,500</strong> flat rate
+                        <strong>Quoted on Inquiry</strong>
                       </td>
-                      <td>3 – 5 Business Days</td>
+                      <td>
+                        <strong>3 – 7 Business Days</strong>
+                      </td>
                       <td>Tracked Interstate Express</td>
                     </tr>
                     <tr>
                       <td>
-                        <strong>International (UK, US, Canada, EU, Ghana)</strong>
+                        <strong>International (UK, US, Canada, EU, Ghana, Worldwide)</strong>
                       </td>
-                      <td>Quoted on inquiry based on weight</td>
-                      <td>3 – 7 Business Days</td>
+                      <td>
+                        <strong>Quoted on Inquiry</strong>
+                      </td>
+                      <td>
+                        <strong>3 – 7 Business Days</strong>
+                      </td>
                       <td>DHL Express / FedEx Priority</td>
                     </tr>
                   </tbody>

@@ -164,3 +164,9 @@ export function updateOrderStatus(id: string, status: Order['status']): Order | 
   }
   return null;
 }
+
+export function deleteOrder(id: string): boolean {
+  const initialLength = ordersStore.length;
+  ordersStore = ordersStore.filter((o) => o.id !== id);
+  return ordersStore.length < initialLength;
+}

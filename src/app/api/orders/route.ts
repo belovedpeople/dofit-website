@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllOrders, createOrder, updateOrderStatus, Order } from '@/data/orders';
+import { getAllOrders, createOrder, updateOrderStatus, deleteOrder, Order } from '@/data/orders';
 import { productsStore } from '@/data/products';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
@@ -197,5 +197,33 @@ export async function PATCH(req: Request) {
   } catch (error) {
     console.error('Order update error:', error);
     return NextResponse.json({ success: false, error: 'Failed to update order' }, { status: 400 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ success: false, error: 'Order ID is required' }, { status: 400 });
+    }
+
+    // 1. Delete from Supabase if configured
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('orders').delete().eq('id', id);
+      } catch (err) {
+        console.error('Supabase order delete error:', err);
+      }
+    }
+
+    // 2. Delete from in-memory / local store
+    deleteOrder(id);
+
+    return NextResponse.json({ success: true, message: `Order #${id} deleted successfully` });
+  } catch (error) {
+    console.error('Order deletion error:', error);
+    return NextResponse.json({ success: false, error: 'Failed to delete order' }, { status: 500 });
   }
 }
