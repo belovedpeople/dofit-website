@@ -274,12 +274,12 @@
 .drawerContent {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
 }
 
 .drawerLink {
   font-family: var(--font-asa-disp);
-  font-size: 26px;
+  font-size: 20px;
   color: var(--asa-cream);
   transition: color 0.2s ease;
 }

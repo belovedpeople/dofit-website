@@ -73,13 +73,14 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { action, email, password, name, role, id } = body;
+    const cleanPass = typeof password === 'string' ? password.trim() : '';
 
     // Password reset action
-    if (action === 'reset-password' && (id || email) && password) {
-      if (password.length < 6) {
+    if (action === 'reset-password' && (id || email) && cleanPass) {
+      if (cleanPass.length < 6) {
         return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
       }
-      updateAdminPassword(id || email, password);
+      updateAdminPassword(id || email, cleanPass);
       if (isSupabaseConfigured && supabase) {
         try {
           await supabase.from('showcase_content').upsert({
@@ -94,14 +95,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'Password updated successfully' });
     }
 
-    if (!email || !password) {
+    if (!email || !cleanPass) {
       return NextResponse.json(
         { error: 'Email and password are required' },
         { status: 400 }
       );
     }
 
-    if (password.length < 6) {
+    if (cleanPass.length < 6) {
       return NextResponse.json(
         { error: 'Password must be at least 6 characters long' },
         { status: 400 }
@@ -113,7 +114,7 @@ export async function POST(request: NextRequest) {
     // 1. Add to local store
     const { user, isNew } = addAdminUser({
       email: cleanEmail,
-      password,
+      password: cleanPass,
       name: name?.trim() || 'Store Staff',
       role: role || 'Store Admin',
     });

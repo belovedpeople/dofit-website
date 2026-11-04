@@ -31,6 +31,7 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'features' | 'fabric' | 'shipping'>('features');
   const [addedAnimation, setAddedAnimation] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Fullscreen Lightbox & Zoom Viewer state
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -52,18 +53,59 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
     setZoomLevel(1);
   }, [slug]);
 
-  // Lock body scroll when lightbox is active
+  // Lock body scroll when lightbox or size guide modal is active
   useEffect(() => {
-    if (lightboxOpen) {
+    if (lightboxOpen || sizeGuideOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
-      setZoomLevel(1);
+      if (!lightboxOpen) setZoomLevel(1);
     }
     return () => {
       document.body.style.overflow = '';
     };
-  }, [lightboxOpen]);
+  }, [lightboxOpen, sizeGuideOpen]);
+
+  const handleCopyProductLink = async () => {
+    if (typeof window !== 'undefined') {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2500);
+      } catch {
+        // Fallback for older browsers or restricted permissions
+        const input = document.createElement('input');
+        input.value = window.location.href;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2500);
+      }
+    }
+  };
+
+  const handleShareProduct = async () => {
+    if (typeof window !== 'undefined') {
+      const shareUrl = window.location.href;
+      const productName = product?.name || 'Dofit Wears';
+      const shareText = `Check out the ${productName} on Dofit Wears!`;
+      if (typeof navigator !== 'undefined' && navigator.share) {
+        try {
+          await navigator.share({
+            title: `${productName} | Dofit Wears`,
+            text: shareText,
+            url: shareUrl,
+          });
+          return;
+        } catch {
+          // user cancelled or share unsupported, fallback to copy
+        }
+      }
+      handleCopyProductLink();
+    }
+  };
 
   // Unified list of images and videos: VIDEOS FIRST as requested!
   const mediaList: Array<{ type: 'image' | 'video'; url: string }> = [
@@ -462,6 +504,52 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                     ? '✓ ADDED TO BAG'
                     : `ADD TO BAG · ${formattedActivePrice}`}
               </button>
+            </div>
+
+            {/* Share & Copy Product Link */}
+            <div className={styles.shareSection}>
+              <div className={styles.shareHeader}>
+                <span className={styles.shareLabel}>Share this piece</span>
+                {copiedLink && (
+                  <span style={{ fontSize: '12px', color: '#4ADE80', fontWeight: 600 }}>
+                    ✓ Link copied to clipboard!
+                  </span>
+                )}
+              </div>
+              <div className={styles.shareActions}>
+                <button
+                  type="button"
+                  className={`${styles.shareBtn} ${copiedLink ? styles.shareBtnCopied : ''}`}
+                  onClick={handleCopyProductLink}
+                  title="Copy link to clipboard"
+                >
+                  <span>{copiedLink ? '✓' : '📋'}</span>
+                  <span>{copiedLink ? 'Copied!' : 'Copy Link'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.shareBtn}
+                  onClick={handleShareProduct}
+                  title="Share to social media or contacts"
+                >
+                  <span>↗</span>
+                  <span>Share</span>
+                </button>
+
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(
+                    `Check out the ${product?.name || 'piece'} on Dofit: https://dofit.fit/products/${product?.id || ''}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${styles.shareBtn} ${styles.shareBtnWa}`}
+                  title="Share directly via WhatsApp"
+                >
+                  <span>💬</span>
+                  <span>WhatsApp</span>
+                </a>
+              </div>
             </div>
 
             {/* Trust Badges */}

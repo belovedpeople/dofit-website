@@ -535,3 +535,4 @@ export default function OrderReceiptModal({ order, onClose }: OrderReceiptModalP
     </div>
   );
 }
+

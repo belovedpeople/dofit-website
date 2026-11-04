@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    const cleanPass = typeof password === 'string' ? password.trim() : '';
     let authUser: { id: string; email: string; name: string; role: string } | null = null;
 
     // 1. Check in Supabase admin_users table if configured
@@ -27,10 +28,9 @@ export async function POST(request: NextRequest) {
           .from('admin_users')
           .select('*')
           .eq('email', cleanEmail)
-          .eq('password', password)
           .maybeSingle();
 
-        if (!error && data) {
+        if (!error && data && (data.password === password || data.password === cleanPass || data.password?.trim() === cleanPass)) {
           authUser = {
             id: data.id,
             email: data.email,
@@ -60,7 +60,8 @@ export async function POST(request: NextRequest) {
           if (data?.content && Array.isArray(data.content)) {
             const matched = data.content.find(
               (u: any) =>
-                u.email?.toLowerCase() === cleanEmail && u.password === password
+                u.email?.toLowerCase().trim() === cleanEmail &&
+                (u.password === password || u.password === cleanPass || u.password?.trim() === cleanPass)
             );
 
             if (matched) {
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     // 2. If not found in Supabase or Supabase is not ready, verify against local store
     if (!authUser) {
-      const verified = verifyAdminCredentials(cleanEmail, password);
+      const verified = verifyAdminCredentials(cleanEmail, cleanPass);
       if (verified) {
         authUser = verified;
 

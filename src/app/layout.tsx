@@ -44,6 +44,9 @@ export const metadata: Metadata = {
     description: "Official Dofit Wears & Àṣà by Dofit. Luxury high-performance activewear and cultural Adire couture.",
     images: ["https://dofit.fit/images/logo.png"],
   },
+  verification: {
+    google: "mOLb4G5sDV-I8KIFIhk5DGMY4DK8ujjdNT0y0H",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -56,6 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" href="/images/logo.png" type="image/png" sizes="any" />
         <link rel="apple-touch-icon" href="/images/logo.png" />
         <meta name="theme-color" content="#0A0A0C" />
+        <meta name="google-site-verification" content="mOLb4G5sDV-I8KIFIhk5DGMY4DK8ujjdNT0y0H" />
       </head>
       <body>
         <AppProviders>

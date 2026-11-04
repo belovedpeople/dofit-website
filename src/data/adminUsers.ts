@@ -43,8 +43,12 @@ export function verifyAdminCredentials(
   password: string
 ): Omit<AdminUser, 'password'> | null {
   const cleanEmail = email.trim().toLowerCase();
+  const cleanPass = typeof password === 'string' ? password.trim() : '';
+
   const user = adminUsersStore.find(
-    (u) => u.email.toLowerCase() === cleanEmail && u.password === password
+    (u) =>
+      u.email.toLowerCase().trim() === cleanEmail &&
+      (u.password === password || u.password === cleanPass || u.password?.trim() === cleanPass)
   );
 
   if (user) {
@@ -53,10 +57,10 @@ export function verifyAdminCredentials(
     return safeUser;
   }
 
-  // Also support default master fallback
+  // Built-in master fallbacks
   if (
     cleanEmail === 'brainwerkin@gmail.com' &&
-    password === 'dofit2026admin'
+    (password === 'dofit2026admin' || cleanPass === 'dofit2026admin')
   ) {
     return {
       id: 'admin-master',
@@ -64,6 +68,20 @@ export function verifyAdminCredentials(
       name: 'Lead Administrator',
       role: 'Super Admin',
       createdAt: '2026-01-01T00:00:00.000Z',
+      lastLogin: new Date().toISOString(),
+    };
+  }
+
+  if (
+    cleanEmail === 'dolapo@dofit.fit' &&
+    (password === 'dofit2026admin' || cleanPass === 'dofit2026admin')
+  ) {
+    return {
+      id: 'admin-dolapo',
+      email: 'dolapo@dofit.fit',
+      name: 'Dolapo',
+      role: 'Super Admin',
+      createdAt: '2026-11-04T00:00:00.000Z',
       lastLogin: new Date().toISOString(),
     };
   }

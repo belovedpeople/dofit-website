@@ -204,16 +204,18 @@
   transition: max-height 0.5s var(--ease-out);
 }
 
-.mobile.mobileOpen { max-height: 500px; }
+.mobile.mobileOpen { max-height: 600px; }
 
 .mobileLinks {
-  padding: 28px 0 16px;
+  padding: 14px 0 8px;
 }
 
 .mobileLink {
   display: block;
-  padding: 14px var(--pad-x);
-  font-size: 36px;
+  padding: 9px var(--pad-x);
+  font-size: clamp(18px, 4.8vw, 22px);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--white-85);
   transition: color 0.25s ease, padding-left 0.3s ease;
 }
@@ -224,7 +226,7 @@
 .mobileLinkAsa:hover { color: var(--asa-gold-lt) !important; }
 
 .mobileCta {
-  padding: 16px var(--pad-x) 32px;
+  padding: 10px var(--pad-x) 20px;
 }
 
 .mobileInstallNavBtn {

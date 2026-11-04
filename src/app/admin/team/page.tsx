@@ -17,6 +17,11 @@ export default function AdminTeamPage() {
   const [team, setTeam] = useState<StaffUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [resetTarget, setResetTarget] = useState<StaffUser | null>(null);
+  const [resetNewPass, setResetNewPass] = useState('');
+  const [resetSubmitting, setResetSubmitting] = useState(false);
+  const [resetMsg, setResetMsg] = useState('');
+  const [resetErr, setResetErr] = useState('');
 
   // Form State
   const [name, setName] = useState('');
@@ -123,30 +128,49 @@ export default function AdminTeamPage() {
     }
   };
 
-  const handleResetPassword = async (member: StaffUser) => {
-    const newPass = window.prompt(`Enter new login password for ${member.name} (${member.email}):`);
-    if (!newPass) return;
-    if (newPass.length < 6) {
-      alert('Password must be at least 6 characters long.');
+  const handleOpenReset = (member: StaffUser) => {
+    setResetTarget(member);
+    setResetNewPass('');
+    setResetMsg('');
+    setResetErr('');
+  };
+
+  const handleConfirmReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetTarget) return;
+    const clean = resetNewPass.trim();
+    if (clean.length < 6) {
+      setResetErr('Password must be at least 6 characters long.');
       return;
     }
+
+    setResetSubmitting(true);
+    setResetErr('');
+    setResetMsg('');
+
     try {
       const res = await fetch('/api/admin-users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'reset-password',
-          id: member.id,
-          email: member.email,
-          password: newPass,
+          id: resetTarget.id,
+          email: resetTarget.email,
+          password: clean,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to update password');
-      alert(`Password updated for ${member.name}! They can now log in with this password.`);
-      fetchTeam();
+      setResetMsg(`Password updated successfully for ${resetTarget.name}!`);
+      setTimeout(() => {
+        setResetTarget(null);
+        setResetMsg('');
+        fetchTeam();
+      }, 1400);
     } catch (err: any) {
-      alert(err?.message || 'Error updating password');
+      setResetErr(err?.message || 'Error updating password. Try again.');
+    } finally {
+      setResetSubmitting(false);
     }
   };
 
@@ -292,12 +316,12 @@ export default function AdminTeamPage() {
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <button
                             type="button"
-                            onClick={() => handleResetPassword(member)}
+                            onClick={() => handleOpenReset(member)}
                             style={{
-                              background: 'rgba(56, 189, 248, 0.1)',
-                              border: '1px solid rgba(56, 189, 248, 0.3)',
+                              background: 'rgba(56, 189, 248, 0.12)',
+                              border: '1px solid rgba(56, 189, 248, 0.35)',
                               color: '#38BDF8',
-                              padding: '4px 10px',
+                              padding: '5px 12px',
                               borderRadius: '6px',
                               cursor: 'pointer',
                               fontSize: '11.5px',
@@ -525,6 +549,123 @@ export default function AdminTeamPage() {
                   }}
                 >
                   {submitting ? 'Creating...' : 'Grant Access →'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Reset Password Modal */}
+      {resetTarget && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.8)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: '20px',
+          }}
+          onClick={() => setResetTarget(null)}
+        >
+          <div
+            style={{
+              background: '#12121A',
+              border: '1px solid rgba(56, 189, 248, 0.3)',
+              borderRadius: '16px',
+              padding: '28px',
+              width: '100%',
+              maxWidth: '460px',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.7)',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', color: '#fff', margin: 0, fontWeight: 700 }}>
+                🔑 Set Password for {resetTarget.name}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setResetTarget(null)}
+                style={{ background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', marginBottom: '16px', lineHeight: 1.4 }}>
+              Account: <strong style={{ color: '#38BDF8' }}>{resetTarget.email}</strong>. Enter the new password below so they can immediately sign in.
+            </p>
+
+            <form onSubmit={handleConfirmReset} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '11.5px', fontWeight: 700, color: 'rgba(255,255,255,0.7)', marginBottom: '6px' }}>
+                  New Password (min 6 characters)
+                </label>
+                <input
+                  type="text"
+                  value={resetNewPass}
+                  onChange={(e) => setResetNewPass(e.target.value)}
+                  placeholder="e.g. dofit2026admin"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.15)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                  required
+                />
+              </div>
+
+              {resetErr && (
+                <p style={{ color: '#EF4444', fontSize: '12px', margin: 0 }}>{resetErr}</p>
+              )}
+
+              {resetMsg && (
+                <p style={{ color: '#34D399', fontSize: '12px', margin: 0 }}>{resetMsg}</p>
+              )}
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setResetTarget(null)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={resetSubmitting}
+                  style={{
+                    flex: 2,
+                    padding: '12px',
+                    background: '#0284C7',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontSize: '13px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {resetSubmitting ? 'Saving...' : 'Update Password ✓'}
                 </button>
               </div>
             </form>
