@@ -23,8 +23,8 @@ async function getStoredBroadcasts(): Promise<BroadcastNotification[]> {
       const { data, error } = await supabase
         .from('showcase_content')
         .select('content')
-        .eq('slug', BROADCAST_STORE_SLUG)
-        .single();
+        .eq('id', BROADCAST_STORE_SLUG)
+        .maybeSingle();
 
       if (!error && data?.content && Array.isArray(data.content.broadcasts)) {
         const cleaned = (data.content.broadcasts as BroadcastNotification[]).filter(
@@ -47,14 +47,11 @@ async function persistBroadcasts(list: BroadcastNotification[]): Promise<void> {
     try {
       await supabase
         .from('showcase_content')
-        .upsert(
-          {
-            slug: BROADCAST_STORE_SLUG,
-            content: { broadcasts: list, updatedAt: new Date().toISOString() },
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'slug' }
-        );
+        .upsert({
+          id: BROADCAST_STORE_SLUG,
+          content: { broadcasts: list, updatedAt: new Date().toISOString() },
+          updated_at: new Date().toISOString(),
+        });
     } catch (err) {
       console.warn('Supabase broadcasts save warning:', err);
     }

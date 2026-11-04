@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { defaultShowcaseContent, ShowcaseContent } from '@/data/showcase';
-import { compressImageIfNeeded } from '@/lib/imageCompression';
+import { notifyShowcaseUpdated } from '@/hooks/useShowcaseContent';
+import { uploadMediaFile } from '@/lib/uploadHelper';
 import styles from '../admin.module.css';
 
 export default function AdminContentCmsPage() {
@@ -29,22 +30,28 @@ export default function AdminContentCmsPage() {
 
   const saveShowcaseData = async (dataToSave: ShowcaseContent, label?: string) => {
     setSaving(true);
+    // Immediately broadcast to local tab & browser storage so preview & clients update
+    notifyShowcaseUpdated(dataToSave);
+
     try {
       const res = await fetch('/api/showcase', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSave),
       });
+
       if (res.ok) {
         setToastMsg(`✓ ${label || 'Showcase'} published live to landing pages!`);
         setSavedToast(true);
         setTimeout(() => setSavedToast(false), 3500);
       } else {
-        alert('Failed to save showcase changes to database.');
+        const errJson = await res.json().catch(() => null);
+        const errMsg = errJson?.error || `Server returned status ${res.status}`;
+        alert(`Notice: Showcase saved locally, but database sync returned an error:\n\n${errMsg}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Error saving changes to database.');
+      alert(`Network error saving to database: ${err?.message || 'Check your connection'}`);
     } finally {
       setSaving(false);
     }
@@ -72,37 +79,14 @@ export default function AdminContentCmsPage() {
     setUploadingTarget('uploading');
 
     try {
-      const processed = await compressImageIfNeeded(file);
-      if (processed.size > 4.5 * 1024 * 1024) {
-        throw new Error(`File is too large (${(processed.size / (1024 * 1024)).toFixed(1)}MB). Max size is 4.5MB.`);
-      }
+      const result = await uploadMediaFile(file, {
+        productId: 'showcase',
+      });
 
-      const formData = new FormData();
-      formData.append('files', processed);
-      formData.append('productId', 'showcase');
-
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      if (!res.ok) {
-        const text = await res.text();
-        let msg = `Server returned status ${res.status}`;
-        if (res.status === 413 || text.includes('Request Entity Too Large')) {
-          msg = 'Image file exceeds the 4.5MB server upload limit.';
-        } else {
-          try {
-            const json = JSON.parse(text);
-            if (json.error) msg = json.error;
-          } catch {
-            msg = text.slice(0, 100);
-          }
-        }
-        throw new Error(msg);
-      }
-
-      const data = await res.json();
-      if (data.urls && data.urls[0]) {
-        uploadCallbackRef.current(data.urls[0]);
+      if (result.url) {
+        uploadCallbackRef.current(result.url);
       } else {
-        alert(data.error || 'Upload failed');
+        alert('Upload failed: no URL returned.');
       }
     } catch (err: any) {
       console.error(err);

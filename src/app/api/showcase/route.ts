@@ -11,36 +11,25 @@ const NO_CACHE_HEADERS = {
   'Vercel-CDN-Cache-Control': 'no-store',
 };
 
-// GET /api/showcase
+// GET /api/showcase — fetch current landing page showcase content
 export async function GET() {
   if (isSupabaseConfigured && supabase) {
     try {
-      // 1. Try lookup by id 'main'
-      let { data, error } = await supabase
+      const { data, error } = await supabase
         .from('showcase_content')
-        .select('*')
+        .select('content')
         .eq('id', 'main')
         .maybeSingle();
 
-      // 2. Fallback: try lookup by slug 'main'
-      if (!data?.content) {
-        const bySlug = await supabase
-          .from('showcase_content')
-          .select('*')
-          .eq('slug', 'main')
-          .maybeSingle();
-        if (bySlug.data?.content) {
-          data = bySlug.data;
-          error = null;
-        }
-      }
-
-      if (!error && data && data.content) {
+      if (!error && data?.content && typeof data.content === 'object') {
         updateShowcaseStore(data.content);
         return NextResponse.json(
           { showcase: data.content, source: 'supabase' },
           { headers: NO_CACHE_HEADERS }
         );
+      }
+      if (error) {
+        console.warn('Supabase showcase_content lookup warning:', error.message);
       }
     } catch (err) {
       console.error('Supabase showcase read error:', err);
@@ -53,7 +42,7 @@ export async function GET() {
   );
 }
 
-// POST /api/showcase — update showcase data
+// POST /api/showcase — update showcase data and persist to Supabase
 export async function POST(request: NextRequest) {
   try {
     const body: Partial<ShowcaseContent> = await request.json();
@@ -61,31 +50,32 @@ export async function POST(request: NextRequest) {
 
     if (isSupabaseConfigured && supabase) {
       try {
-        // Try upserting with id
-        const resId = await supabase
+        // Upsert matching public.showcase_content schema: (id, content, updated_at)
+        const { error } = await supabase
           .from('showcase_content')
           .upsert({
             id: 'main',
-            slug: 'main',
             content: updated,
             updated_at: new Date().toISOString(),
           });
 
-        if (resId.error) {
-          console.warn('Upsert with id warning, attempting slug conflict...', resId.error);
-          await supabase
-            .from('showcase_content')
-            .upsert(
-              {
-                slug: 'main',
-                content: updated,
-                updated_at: new Date().toISOString(),
-              },
-              { onConflict: 'slug' }
-            );
+        if (error) {
+          console.error('Supabase showcase upsert error:', error);
+          return NextResponse.json(
+            {
+              error: `Database save failed: ${error.message}`,
+              code: error.code,
+              hint: error.hint,
+            },
+            { status: 500, headers: NO_CACHE_HEADERS }
+          );
         }
-      } catch (err) {
-        console.error('Supabase showcase upsert error:', err);
+      } catch (err: any) {
+        console.error('Supabase showcase upsert exception:', err);
+        return NextResponse.json(
+          { error: err?.message || 'Database connection error during save' },
+          { status: 500, headers: NO_CACHE_HEADERS }
+        );
       }
     }
 
@@ -93,9 +83,11 @@ export async function POST(request: NextRequest) {
       { success: true, showcase: updated },
       { headers: NO_CACHE_HEADERS }
     );
-  } catch (err) {
+  } catch (err: any) {
     console.error('Showcase update error:', err);
-    return NextResponse.json({ error: 'Failed to update showcase' }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || 'Failed to update showcase' },
+      { status: 500, headers: NO_CACHE_HEADERS }
+    );
   }
 }
-

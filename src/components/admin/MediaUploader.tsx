@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
-import { compressImageIfNeeded } from '@/lib/imageCompression';
+import { uploadMediaFile } from '@/lib/uploadHelper';
 import styles from './MediaUploader.module.css';
 
 interface MediaFile {
@@ -54,56 +54,25 @@ export default function MediaUploader({
 
     for (let i = 0; i < fileArray.length; i++) {
       const originalFile = fileArray[i];
-      const isVideo = originalFile.type.startsWith('video');
-      const percent = Math.round((i / fileArray.length) * 100);
-      setUploadProgress(percent);
-      setUploadStatusText(`Uploading ${i + 1} of ${fileArray.length}: ${originalFile.name} (${percent}%)`);
+      const basePercent = Math.round((i / fileArray.length) * 100);
+      setUploadProgress(basePercent);
 
       try {
-        // Optimize & compress photos client-side (prevents 4.5MB Vercel payload limit)
-        const processedFile = await compressImageIfNeeded(originalFile);
+        const result = await uploadMediaFile(originalFile, {
+          productId,
+          onProgress: (_p, statusText) => {
+            setUploadStatusText(
+              `[${i + 1}/${fileArray.length}] ${originalFile.name}: ${statusText}`
+            );
+          },
+        });
 
-        // Safeguard for video or large files
-        if (processedFile.size > 4.5 * 1024 * 1024) {
-          throw new Error(
-            `"${originalFile.name}" (${(processedFile.size / (1024 * 1024)).toFixed(1)}MB) exceeds the 4.5MB upload limit. Please compress it first.`
-          );
-        }
-
-        const safeFileName = originalFile.name.replace(/\.[^.]+$/, '') + '.jpg';
-        const formData = new FormData();
-        formData.append('files', processedFile, safeFileName);
-        if (productId) formData.append('productId', productId);
-
-        const res = await fetch('/api/upload', { method: 'POST', body: formData });
-
-        if (!res.ok) {
-          const text = await res.text();
-          let msg = `Server returned status ${res.status}`;
-          if (res.status === 413 || text.includes('Request Entity Too Large')) {
-            msg = `"${originalFile.name}" is too large for upload (exceeds 4.5MB server limit).`;
-          } else {
-            try {
-              const json = JSON.parse(text);
-              if (json.error) msg = json.error;
-            } catch {
-              msg = text.slice(0, 100);
-            }
-          }
-          throw new Error(msg);
-        }
-
-        const data = await res.json();
-        if (data.urls && data.urls.length > 0) {
-          const fileObj: MediaFile = {
-            url: data.urls[0],
-            type: isVideo ? 'video' : 'image',
-            name: originalFile.name,
-          };
-          newFiles.push(fileObj);
-        } else {
-          throw new Error(data.error || 'No URL returned from upload server');
-        }
+        const fileObj: MediaFile = {
+          url: result.url,
+          type: result.isVideo ? 'video' : 'image',
+          name: originalFile.name,
+        };
+        newFiles.push(fileObj);
       } catch (err: any) {
         console.error(`Upload error on ${originalFile.name}:`, err);
         let errMsg = err?.message || `Failed to upload ${originalFile.name}`;
