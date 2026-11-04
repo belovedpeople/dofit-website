@@ -1,6 +1,7 @@
 'use client';
 import { useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import { compressImageIfNeeded } from '@/lib/imageCompression';
 import styles from './MediaUploader.module.css';
 
 interface MediaFile {
@@ -29,6 +30,7 @@ export default function MediaUploader({
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatusText, setUploadStatusText] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
@@ -45,42 +47,92 @@ export default function MediaUploader({
 
     setUploading(true);
     setUploadProgress(0);
+    setUploadStatusText(`Preparing ${fileArray.length} file${fileArray.length > 1 ? 's' : ''}...`);
 
-    const formData = new FormData();
-    fileArray.forEach((f) => formData.append('files', f));
-    if (productId) formData.append('productId', productId);
+    const newFiles: MediaFile[] = [];
+    const errors: string[] = [];
 
-    try {
-      setUploadProgress(30);
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      setUploadProgress(80);
-      const data = await res.json();
+    for (let i = 0; i < fileArray.length; i++) {
+      const originalFile = fileArray[i];
+      const isVideo = originalFile.type.startsWith('video');
+      const percent = Math.round((i / fileArray.length) * 100);
+      setUploadProgress(percent);
+      setUploadStatusText(`Uploading ${i + 1} of ${fileArray.length}: ${originalFile.name} (${percent}%)`);
 
-      if (!res.ok || !data.urls) {
-        throw new Error(data.error || 'Upload failed. Please check your credentials.');
+      try {
+        // Optimize & compress photos client-side (prevents 4.5MB Vercel payload limit)
+        const processedFile = await compressImageIfNeeded(originalFile);
+
+        // Safeguard for video or large files
+        if (processedFile.size > 4.5 * 1024 * 1024) {
+          throw new Error(
+            `"${originalFile.name}" (${(processedFile.size / (1024 * 1024)).toFixed(1)}MB) exceeds the 4.5MB upload limit. Please compress it first.`
+          );
+        }
+
+        const formData = new FormData();
+        formData.append('files', processedFile);
+        if (productId) formData.append('productId', productId);
+
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+
+        if (!res.ok) {
+          const text = await res.text();
+          let msg = `Server returned status ${res.status}`;
+          if (res.status === 413 || text.includes('Request Entity Too Large')) {
+            msg = `"${originalFile.name}" is too large for upload (exceeds 4.5MB server limit).`;
+          } else {
+            try {
+              const json = JSON.parse(text);
+              if (json.error) msg = json.error;
+            } catch {
+              msg = text.slice(0, 100);
+            }
+          }
+          throw new Error(msg);
+        }
+
+        const data = await res.json();
+        if (data.urls && data.urls.length > 0) {
+          const fileObj: MediaFile = {
+            url: data.urls[0],
+            type: isVideo ? 'video' : 'image',
+            name: originalFile.name,
+          };
+          newFiles.push(fileObj);
+        } else {
+          throw new Error(data.error || 'No URL returned from upload server');
+        }
+      } catch (err: any) {
+        console.error(`Upload error on ${originalFile.name}:`, err);
+        errors.push(err?.message || `Failed to upload ${originalFile.name}`);
       }
-
-      const newFiles: MediaFile[] = data.urls.map((url: string, i: number) => {
-        const original = fileArray[i];
-        return {
-          url,
-          type: original.type.startsWith('video') ? 'video' : 'image',
-          name: original.name,
-        };
-      });
-      const updated = [...mediaFiles, ...newFiles];
-      setMediaFiles(updated);
-      emitChange(updated);
-      setUploadProgress(100);
-    } catch (err) {
-      console.error('Upload failed:', err);
-      alert(err instanceof Error ? err.message : 'Upload failed. Please try again.');
-    } finally {
-      setTimeout(() => {
-        setUploading(false);
-        setUploadProgress(0);
-      }, 600);
     }
+
+    setUploadProgress(100);
+    setUploadStatusText('Upload complete!');
+
+    if (newFiles.length > 0) {
+      setMediaFiles((prev) => {
+        const updated = [...prev, ...newFiles];
+        emitChange(updated);
+        return updated;
+      });
+    }
+
+    if (errors.length > 0) {
+      alert(`Upload Notice:\n\n${errors.join('\n\n')}`);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+
+    setTimeout(() => {
+      setUploading(false);
+      setUploadProgress(0);
+      setUploadStatusText('');
+    }, 600);
   };
 
   const handleDrop = (e: React.DragEvent) => {
@@ -127,7 +179,9 @@ export default function MediaUploader({
         {uploading ? (
           <div className={styles.uploadingState}>
             <div className={styles.spinner} />
-            <span>Uploading... {uploadProgress}%</span>
+            <span style={{ textAlign: 'center', wordBreak: 'break-word', padding: '0 8px' }}>
+              {uploadStatusText || `Uploading... ${uploadProgress}%`}
+            </span>
             <div className={styles.progressBar}>
               <div className={styles.progressFill} style={{ width: `${uploadProgress}%` }} />
             </div>

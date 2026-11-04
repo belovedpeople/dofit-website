@@ -363,15 +363,19 @@
   .links {
     display: none;
   }
+
   .mobileInstallNavBtn {
     display: flex;
   }
+
   .menuBtn {
     display: flex;
   }
+
   .mobileDrawer {
     display: block;
   }
+
   .adireTopBar {
     display: none;
   }

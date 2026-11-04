@@ -8,6 +8,8 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -41,8 +43,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ urls: uploadedUrls });
-  } catch (err) {
+  } catch (err: any) {
     console.error('Cloudinary upload error:', err);
-    return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
+    return NextResponse.json(
+      { error: err?.message || 'Upload failed. Please check Cloudinary configuration.' },
+      { status: 500 }
+    );
   }
 }

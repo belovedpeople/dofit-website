@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { defaultShowcaseContent, ShowcaseContent } from '@/data/showcase';
+import { compressImageIfNeeded } from '@/lib/imageCompression';
 import styles from '../admin.module.css';
 
 export default function AdminContentCmsPage() {
@@ -36,21 +37,43 @@ export default function AdminContentCmsPage() {
     if (!file || !uploadCallbackRef.current) return;
 
     setUploadingTarget('uploading');
-    const formData = new FormData();
-    formData.append('files', file);
-    formData.append('productId', 'showcase');
 
     try {
+      const processed = await compressImageIfNeeded(file);
+      if (processed.size > 4.5 * 1024 * 1024) {
+        throw new Error(`File is too large (${(processed.size / (1024 * 1024)).toFixed(1)}MB). Max size is 4.5MB.`);
+      }
+
+      const formData = new FormData();
+      formData.append('files', processed);
+      formData.append('productId', 'showcase');
+
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (!res.ok) {
+        const text = await res.text();
+        let msg = `Server returned status ${res.status}`;
+        if (res.status === 413 || text.includes('Request Entity Too Large')) {
+          msg = 'Image file exceeds the 4.5MB server upload limit.';
+        } else {
+          try {
+            const json = JSON.parse(text);
+            if (json.error) msg = json.error;
+          } catch {
+            msg = text.slice(0, 100);
+          }
+        }
+        throw new Error(msg);
+      }
+
       const data = await res.json();
       if (data.urls && data.urls[0]) {
         uploadCallbackRef.current(data.urls[0]);
       } else {
         alert(data.error || 'Upload failed');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Upload failed. Please check network.');
+      alert(err?.message || 'Upload failed. Please check network.');
     } finally {
       setUploadingTarget(null);
       if (fileInputRef.current) fileInputRef.current.value = '';
