@@ -64,3 +64,14 @@ export function addBroadcast(data: {
   broadcastsStore.unshift(newBroadcast);
   return newBroadcast;
 }
+
+export function deleteBroadcast(id: string): boolean {
+  const index = broadcastsStore.findIndex((b) => b.id === id);
+  if (index !== -1) {
+    broadcastsStore.splice(index, 1);
+    return true;
+  }
+  return false;
+}
+
+

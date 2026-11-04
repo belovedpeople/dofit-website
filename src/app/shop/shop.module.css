@@ -43,7 +43,7 @@
 
 .heroSub {
   font-size: 15px;
-  color: var(--white-70, rgba(255,255,255,0.7));
+  color: var(--white-70, rgba(255, 255, 255, 0.7));
   max-width: 620px;
   margin: 0 auto 36px;
   line-height: 1.6;
@@ -64,7 +64,7 @@
 .brandTab {
   background: transparent;
   border: none;
-  color: var(--white-70, rgba(255,255,255,0.7));
+  color: var(--white-70, rgba(255, 255, 255, 0.7));
   padding: 10px 22px;
   border-radius: 999px;
   font-family: var(--font-body);
@@ -202,7 +202,7 @@
 .catPill {
   background: transparent;
   border: 1px solid var(--white-08);
-  color: var(--white-70, rgba(255,255,255,0.7));
+  color: var(--white-70, rgba(255, 255, 255, 0.7));
   padding: 7px 18px;
   border-radius: 999px;
   font-family: var(--font-body);
@@ -618,7 +618,7 @@
 
 .quickSizeLabel {
   font-size: 12px;
-  color: var(--white-70, rgba(255,255,255,0.7));
+  color: var(--white-70, rgba(255, 255, 255, 0.7));
   margin-bottom: 8px;
   display: block;
 }
@@ -729,8 +729,13 @@
 }
 
 @keyframes slideLeft {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
 
 .drawerHeader {

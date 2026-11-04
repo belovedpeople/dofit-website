@@ -40,15 +40,16 @@ export default function AnalyticsPage() {
       const orders: Order[] = ordersData.orders || [];
       const products: Product[] = productsData.products || [];
 
-      const totalRevenue = orders.reduce((s, o) => s + o.totalAmount, 0);
-      const dofitRevenue = orders.filter((o) => o.brand === 'dofit' || o.brand === 'mixed').reduce((s, o) => s + o.totalAmount, 0);
-      const asaRevenue = orders.filter((o) => o.brand === 'asa').reduce((s, o) => s + o.totalAmount, 0);
+      const deliveredOrders = orders.filter((o) => o.status === 'Delivered');
+      const totalRevenue = deliveredOrders.reduce((s, o) => s + o.totalAmount, 0);
+      const dofitRevenue = deliveredOrders.filter((o) => o.brand === 'dofit' || o.brand === 'mixed').reduce((s, o) => s + o.totalAmount, 0);
+      const asaRevenue = deliveredOrders.filter((o) => o.brand === 'asa').reduce((s, o) => s + o.totalAmount, 0);
 
       const statusCounts: Record<string, number> = {};
       orders.forEach((o) => { statusCounts[o.status] = (statusCounts[o.status] || 0) + 1; });
 
       const revenueByMonth: Record<string, number> = {};
-      orders.forEach((o) => {
+      deliveredOrders.forEach((o) => {
         const d = new Date(o.createdAt);
         const key = d.toLocaleString('default', { month: 'short', year: '2-digit' });
         revenueByMonth[key] = (revenueByMonth[key] || 0) + o.totalAmount;
@@ -90,9 +91,9 @@ export default function AnalyticsPage() {
       {/* KPI Section */}
       <div className={styles.kpiGrid}>
         <div className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Total Revenue</span>
+          <span className={styles.kpiLabel}>Total Revenue (Delivered)</span>
           <div className={styles.kpiValue}>₦{stats.totalRevenue.toLocaleString()}</div>
-          <span className={styles.kpiSub}>{stats.totalOrders} total orders</span>
+          <span className={styles.kpiSub}>{stats.deliveredOrders} delivered of {stats.totalOrders} total orders</span>
         </div>
         <div className={styles.kpiCard}>
           <span className={styles.kpiLabel}>Dofit Wears Revenue</span>

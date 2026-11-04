@@ -27,15 +27,16 @@ export default function AdminDashboard() {
       });
   }, []);
 
-  const totalSales = orders.reduce((sum, o) => sum + o.totalAmount, 0);
-  const dofitSales = orders
+  const deliveredOrders = orders.filter((o) => o.status === 'Delivered');
+  const totalSales = deliveredOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  const dofitSales = deliveredOrders
     .filter((o) => o.brand === 'dofit' || o.brand === 'mixed')
     .reduce((sum, o) => sum + o.totalAmount, 0);
-  const asaSales = orders
+  const asaSales = deliveredOrders
     .filter((o) => o.brand === 'asa')
     .reduce((sum, o) => sum + o.totalAmount, 0);
 
-  const pendingOrders = orders.filter((o) => o.status === 'Pending' || o.status === 'Processing');
+  const pendingOrders = orders.filter((o) => o.status === 'Pending' || o.status === 'Processing' || o.status === 'Dispatched');
   const lowStockProducts = products.filter((p) => p.stockCount <= 12);
 
   return (
@@ -43,9 +44,11 @@ export default function AdminDashboard() {
       {/* KPI Cards Grid */}
       <div className={styles.kpiGrid}>
         <div className={styles.kpiCard}>
-          <span className={styles.kpiLabel}>Gross Sales (WhatsApp)</span>
+          <span className={styles.kpiLabel}>Gross Sales (Delivered)</span>
           <div className={styles.kpiValue}>₦{totalSales.toLocaleString()}</div>
-          <span className={styles.kpiSub}>{orders.length} Total routed orders</span>
+          <span className={styles.kpiSub}>
+            {deliveredOrders.length} delivered · {pendingOrders.length} pending delivery
+          </span>
         </div>
 
         <div className={styles.kpiCard}>
@@ -53,7 +56,7 @@ export default function AdminDashboard() {
           <div className={styles.kpiValue} style={{ color: 'var(--pink)' }}>
             ₦{dofitSales.toLocaleString()}
           </div>
-          <span className={styles.kpiSub}>Activewear & Streetwear Drops</span>
+          <span className={styles.kpiSub}>Delivered Drops</span>
         </div>
 
         <div className={`${styles.kpiCard} ${styles.kpiCardAsa}`}>
@@ -61,7 +64,7 @@ export default function AdminDashboard() {
           <div className={styles.kpiValue} style={{ color: 'var(--asa-gold)' }}>
             ₦{asaSales.toLocaleString()}
           </div>
-          <span className={styles.kpiSub}>Artisanal Adire & Couture</span>
+          <span className={styles.kpiSub}>Delivered Adire & Couture</span>
         </div>
 
         <div className={styles.kpiCard}>

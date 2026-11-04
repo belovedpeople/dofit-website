@@ -150,6 +150,11 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
   const isAsa = product.brand === 'asa';
   const isOutOfStock = !product.inStock || product.stockCount === 0;
 
+  const activePrice = (product.sizePrices && selectedSize && product.sizePrices[selectedSize]) || product.price;
+  const formattedActivePrice = (product.sizePrices && selectedSize && product.sizePrices[selectedSize])
+    ? `₦${product.sizePrices[selectedSize].toLocaleString()}`
+    : product.formattedPrice;
+
   const currentMedia = mediaList[selectedMediaIndex] || mediaList[0] || { type: 'image', url: '/images/dofit-wears/2-Piece Biker Short Set.png' };
 
   const handleAddToCart = () => {
@@ -340,7 +345,7 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
             </h1>
 
             <div className={styles.priceRow}>
-              <span className={styles.price}>{product.formattedPrice}</span>
+              <span className={styles.price}>{formattedActivePrice}</span>
               <span className={styles.stockNotice}>
                 {isOutOfStock
                   ? '🔴 Currently Out of Stock'
@@ -349,8 +354,6 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                     : '✓ In Stock (Ready to Ship)'}
               </span>
             </div>
-
-            <p className={styles.desc}>{product.description}</p>
 
             {/* Color Selector */}
             {product.colors && product.colors.length > 0 && (
@@ -391,16 +394,34 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                   </button>
                 </div>
                 <div className={styles.sizeGrid}>
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      className={`${styles.sizeBtn} ${selectedSize === s ? styles.sizeActive : ''}`}
-                      onClick={() => setSelectedSize(s)}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                  {product.sizes.map((s) => {
+                    const hasCustomPrice =
+                      product.sizePrices &&
+                      product.sizePrices[s] &&
+                      product.sizePrices[s] !== product.price;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        className={`${styles.sizeBtn} ${selectedSize === s ? styles.sizeActive : ''}`}
+                        onClick={() => setSelectedSize(s)}
+                      >
+                        <span>{s}</span>
+                        {hasCustomPrice && (
+                          <span
+                            style={{
+                              display: 'block',
+                              fontSize: '9.5px',
+                              opacity: 0.85,
+                              marginTop: '2px',
+                            }}
+                          >
+                            ₦{Number(product.sizePrices![s]).toLocaleString()}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -431,7 +452,7 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
 
               <button
                 type="button"
-                className={`btn ${isAsa ? 'btn-gold' : 'btn-pink'} ${styles.addBtn} ${addedAnimation ? styles.addedPulse : ''} ${isOutOfStock ? styles.btnDisabled : ''}`}
+                className={`btn ${isAsa ? 'btn-asa-gold' : 'btn-pink'} ${styles.addBtn} ${addedAnimation ? styles.addedPulse : ''} ${isOutOfStock ? styles.btnDisabled : ''}`}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
               >
@@ -439,7 +460,7 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                   ? 'SOLD OUT'
                   : addedAnimation
                     ? '✓ ADDED TO BAG'
-                    : `ADD TO BAG · ${product.formattedPrice}`}
+                    : `ADD TO BAG · ${formattedActivePrice}`}
               </button>
             </div>
 
@@ -457,6 +478,14 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                 <span>🇳🇬</span>
                 <span>Proudly Crafted & Packaged in Nigeria</span>
               </div>
+            </div>
+
+            {/* Product Story / Description */}
+            <div className={styles.descWrap} style={{ margin: '24px 0 28px' }}>
+              <h4 style={{ fontSize: '12px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginBottom: '8px' }}>
+                Description &amp; Fit
+              </h4>
+              <p className={styles.desc}>{product.description}</p>
             </div>
 
             {/* Details Tabs */}
@@ -784,6 +813,25 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
           )}
         </div>
       )}
+
+      {/* Mobile Sticky Floating Add-to-Bag Bar */}
+      <div className={`${styles.mobileStickyBar} ${isAsa ? styles.mobileStickyBarAsa : ''}`}>
+        <div className={styles.mobileStickyInfo}>
+          <span className={styles.mobileStickyPrice}>{formattedActivePrice}</span>
+          <span className={styles.mobileStickyMeta}>
+            {selectedSize ? `Size: ${selectedSize}` : 'Choose size'}
+            {selectedColor ? ` · ${selectedColor}` : ''}
+          </span>
+        </div>
+        <button
+          type="button"
+          className={`btn ${isAsa ? 'btn-asa-gold' : 'btn-pink'} ${styles.mobileStickyBtn} ${addedAnimation ? styles.addedPulse : ''} ${isOutOfStock ? styles.btnDisabled : ''}`}
+          onClick={handleAddToCart}
+          disabled={isOutOfStock}
+        >
+          {isOutOfStock ? 'Sold Out' : addedAnimation ? '✓ Added' : 'Add to Bag'}
+        </button>
+      </div>
 
       {/* Dynamic Footer */}
       {isAsa ? <AsaFooter /> : <DofitFooter />}

@@ -116,9 +116,9 @@ function ShopContent() {
     return list;
   }, [products, selectedBrand, selectedCategory, selectedSize, priceRange, inStockOnly, searchQuery, sortBy]);
 
-  const handleQuickAdd = (p: Product) => {
+  const handleQuickAdd = (p: Product, sizeOverride?: string) => {
     setQuickAddProduct(p);
-    setQuickSize(p.sizes[0] || 'M');
+    setQuickSize(sizeOverride || p.sizes[0] || 'M');
   };
 
   const confirmQuickAdd = () => {
@@ -333,7 +333,15 @@ function ShopContent() {
                       {/* Pricing and Action Button */}
                       <div className={styles.bottomRow}>
                         <div className={styles.priceCol}>
-                          <span className={styles.price}>{p.formattedPrice}</span>
+                          <span className={styles.price}>
+                            {p.sizePrices &&
+                            Object.values(p.sizePrices).some((v) => typeof v === 'number' && v !== p.price)
+                              ? `From ₦${Math.min(
+                                  p.price,
+                                  ...Object.values(p.sizePrices).filter((v) => typeof v === 'number' && v > 0)
+                                ).toLocaleString()}`
+                              : p.formattedPrice}
+                          </span>
                           <span className={`${styles.stockStatus} ${isOutOfStock ? styles.stockStatusOut : ''}`}>
                             {isOutOfStock ? '● Sold Out' : '✓ In Stock'}
                           </span>
@@ -360,8 +368,7 @@ function ShopContent() {
                               type="button"
                               className={styles.sizePill}
                               onClick={() => {
-                                setQuickSize(s);
-                                handleQuickAdd(p);
+                                handleQuickAdd(p, s);
                               }}
                               title={`Select size ${s}`}
                             >

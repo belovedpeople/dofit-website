@@ -25,6 +25,7 @@ export interface ProductRow {
   care: string[];
   colors: { name: string; hex: string }[];
   sizes: string[];
+  size_prices?: Record<string, number> | null;
   images: string[];
   videos?: string[];
   in_stock: boolean;
@@ -49,6 +50,7 @@ export function mapRowToProduct(row: ProductRow): Product {
     care: Array.isArray(row.care) ? row.care : [],
     colors: Array.isArray(row.colors) ? row.colors : [],
     sizes: Array.isArray(row.sizes) ? row.sizes : [],
+    sizePrices: (row.size_prices && typeof row.size_prices === 'object') ? row.size_prices : undefined,
     images: Array.isArray(row.images) ? row.images : [],
     videos: Array.isArray(row.videos) ? row.videos : [],
     inStock: Boolean(row.in_stock),
@@ -72,6 +74,7 @@ export function mapProductToRow(product: Product): ProductRow {
     care: product.care || [],
     colors: product.colors || [],
     sizes: product.sizes || [],
+    size_prices: product.sizePrices || null,
     images: product.images || [],
     videos: product.videos || [],
     in_stock: product.inStock,

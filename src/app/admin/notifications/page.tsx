@@ -6,6 +6,7 @@ import styles from '../admin.module.css';
 export default function AdminNotificationsPage() {
   const [history, setHistory] = useState<BroadcastNotification[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form State
   const [title, setTitle] = useState('🔥 Secret Flash Drop Alert!');
@@ -34,6 +35,25 @@ export default function AdminNotificationsPage() {
   useEffect(() => {
     fetchHistory();
   }, []);
+
+  const handleDeleteBroadcast = async (id: string, broadcastTitle: string) => {
+    if (!window.confirm(`Delete broadcast: "${broadcastTitle}"?\nThis cannot be undone.`)) {
+      return;
+    }
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/broadcasts?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete broadcast');
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Error deleting broadcast');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handleSendBroadcast = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -432,18 +452,19 @@ export default function AdminNotificationsPage() {
                 <th>Sent At</th>
                 <th>Sender</th>
                 <th>Status</th>
+                <th style={{ textAlign: 'right' }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '24px' }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '24px' }}>
                     Loading past broadcasts...
                   </td>
                 </tr>
               ) : history.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '24px', color: 'rgba(255,255,255,0.4)' }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: 'rgba(255,255,255,0.4)' }}>
                     No broadcasts sent yet.
                   </td>
                 </tr>
@@ -497,6 +518,30 @@ export default function AdminNotificationsPage() {
                         ● Delivered
                       </span>
                     </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        type="button"
+                        disabled={deletingId === item.id}
+                        onClick={() => handleDeleteBroadcast(item.id, item.title)}
+                        style={{
+                          background: 'rgba(239, 68, 68, 0.12)',
+                          border: '1px solid rgba(239, 68, 68, 0.3)',
+                          color: '#EF4444',
+                          padding: '5px 12px',
+                          borderRadius: '6px',
+                          fontSize: '11.5px',
+                          fontWeight: 600,
+                          cursor: deletingId === item.id ? 'not-allowed' : 'pointer',
+                          transition: 'all 0.15s ease',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                        title="Delete broadcast notification"
+                      >
+                        {deletingId === item.id ? 'Deleting...' : '🗑️ Delete'}
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
@@ -507,3 +552,4 @@ export default function AdminNotificationsPage() {
     </div>
   );
 }
+

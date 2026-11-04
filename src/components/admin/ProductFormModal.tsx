@@ -43,12 +43,21 @@ export default function ProductFormModal({ open, product, onClose, onSaved }: Pr
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'basic' | 'media' | 'variants' | 'details'>('basic');
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
 
   useEffect(() => {
     if (open) {
       setForm(isEdit && product ? { ...product, videos: product.videos || [] } : emptyForm());
       setError('');
       setActiveTab('basic');
+      if (isEdit && product?.category) {
+        const isStandard =
+          CATEGORIES_DOFIT.includes(product.category) ||
+          CATEGORIES_ASA.includes(product.category);
+        setIsCustomCategory(!isStandard);
+      } else {
+        setIsCustomCategory(false);
+      }
     }
   }, [open, product, isEdit]);
 
@@ -116,7 +125,7 @@ export default function ProductFormModal({ open, product, onClose, onSaved }: Pr
   const categoryOptions = form.brand === 'asa' ? CATEGORIES_ASA : CATEGORIES_DOFIT;
 
   return (
-    <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
+    <div className={styles.overlay}>
       <div className={styles.modal}>
         {/* Header */}
         <div className={styles.modalHeader}>
@@ -175,17 +184,58 @@ export default function ProductFormModal({ open, product, onClose, onSaved }: Pr
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Category *</label>
-                <select
-                  className={styles.select}
-                  value={form.category || ''}
-                  onChange={(e) => set('category', e.target.value)}
-                >
-                  <option value="">Select category...</option>
-                  {categoryOptions.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label className={styles.label}>Category *</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCustomCategory(!isCustomCategory);
+                      if (!isCustomCategory && !form.category) {
+                        set('category', '');
+                      }
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--pink, #FF1E6A)',
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      padding: 0,
+                    }}
+                  >
+                    {isCustomCategory ? '← Choose from standard list' : '➕ Create Custom Category'}
+                  </button>
+                </div>
+
+                {isCustomCategory ? (
+                  <input
+                    className={styles.input}
+                    placeholder="Type custom category (e.g. Athleisure, Robes, Luxury Streetwear)..."
+                    value={form.category || ''}
+                    onChange={(e) => set('category', e.target.value)}
+                    autoFocus
+                  />
+                ) : (
+                  <select
+                    className={styles.select}
+                    value={form.category || ''}
+                    onChange={(e) => {
+                      if (e.target.value === '__custom__') {
+                        setIsCustomCategory(true);
+                        set('category', '');
+                      } else {
+                        set('category', e.target.value);
+                      }
+                    }}
+                  >
+                    <option value="">Select category...</option>
+                    {categoryOptions.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                    <option value="__custom__">+ Enter Custom Category...</option>
+                  </select>
+                )}
               </div>
 
               <div className={styles.formGroup}>
@@ -290,6 +340,58 @@ export default function ProductFormModal({ open, product, onClose, onSaved }: Pr
                   ))}
                 </div>
               </div>
+
+              {/* Price Per Size (Optional) */}
+              {form.sizes && form.sizes.length > 0 && (
+                <div className={styles.formGroup} style={{ marginTop: '4px' }}>
+                  <div className={styles.listHeader}>
+                    <label className={styles.label}>💰 Price Per Size (Optional)</label>
+                    <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)' }}>
+                      Base: ₦{(form.price || 0).toLocaleString()}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.45)', margin: '0 0 10px', lineHeight: 1.4 }}>
+                    Leave blank to use base price (₦{(form.price || 0).toLocaleString()}). Set custom prices for sizes that cost differently.
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '8px' }}>
+                    {form.sizes.map((size) => (
+                      <div
+                        key={size}
+                        style={{
+                          background: 'rgba(255, 255, 255, 0.03)',
+                          border: '1px solid rgba(255, 255, 255, 0.08)',
+                          borderRadius: '8px',
+                          padding: '8px 10px',
+                        }}
+                      >
+                        <div style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--pink, #FF1E6A)', marginBottom: '4px' }}>
+                          Size {size}
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.35)' }}>₦</span>
+                          <input
+                            type="number"
+                            className={styles.input}
+                            style={{ padding: '4px 6px', fontSize: '12px', height: '28px' }}
+                            placeholder={`${form.price || 0}`}
+                            value={form.sizePrices?.[size] ?? ''}
+                            onChange={(e) => {
+                              const val = e.target.value === '' ? undefined : Number(e.target.value);
+                              const next = { ...(form.sizePrices || {}) };
+                              if (val === undefined || isNaN(val) || val <= 0) {
+                                delete next[size];
+                              } else {
+                                next[size] = val;
+                              }
+                              set('sizePrices', Object.keys(next).length > 0 ? next : undefined);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Colors */}
               <div className={styles.formGroup}>

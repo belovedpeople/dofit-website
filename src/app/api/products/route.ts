@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
       care: body.care || [],
       colors: body.colors || [],
       sizes: body.sizes || [],
+      sizePrices: body.sizePrices && typeof body.sizePrices === 'object' ? body.sizePrices : undefined,
       images: body.images || [],
       videos: body.videos || [],
       inStock: body.inStock !== undefined ? body.inStock : true,
@@ -70,7 +71,13 @@ export async function POST(request: NextRequest) {
 
     if (isSupabaseConfigured && supabase) {
       const row = mapProductToRow(newProduct);
-      const { error } = await supabase.from('products').insert([row]);
+      let { error } = await supabase.from('products').insert([row]);
+      if (error && error.message?.includes('size_prices')) {
+        // Fallback if size_prices column has not yet been added to Supabase table
+        const { size_prices: _, ...rowWithoutSizePrices } = row;
+        const retry = await supabase.from('products').insert([rowWithoutSizePrices]);
+        error = retry.error;
+      }
       if (error) {
         console.error('Supabase insert error:', error);
         return NextResponse.json({ error: error.message }, { status: 500 });

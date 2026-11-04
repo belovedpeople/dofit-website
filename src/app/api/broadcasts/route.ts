@@ -4,6 +4,7 @@ import {
   getAllBroadcasts,
   getLatestBroadcast,
   addBroadcast,
+  deleteBroadcast,
   BroadcastNotification,
 } from '@/data/broadcasts';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
@@ -109,3 +110,36 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to send broadcast' }, { status: 500 });
   }
 }
+
+// DELETE /api/broadcasts?id=... — delete past broadcast
+export async function DELETE(request: NextRequest) {
+  const isAuthed = await isAuthenticatedAdmin();
+  if (!isAuthed) {
+    return NextResponse.json({ error: 'Unauthorized: Admin login required' }, { status: 401 });
+  }
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ error: 'Broadcast id is required' }, { status: 400 });
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('pwa_broadcasts').delete().eq('id', id);
+      } catch (err) {
+        console.warn('Supabase broadcast delete warning:', err);
+      }
+    }
+
+    deleteBroadcast(id);
+
+    return NextResponse.json({ success: true, message: 'Broadcast deleted successfully' });
+  } catch (err) {
+    console.error('Delete broadcast error:', err);
+    return NextResponse.json({ error: 'Failed to delete broadcast' }, { status: 500 });
+  }
+}
+

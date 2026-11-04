@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useCart } from '@/context/CartContext';
+import { useCart, getItemPrice } from '@/context/CartContext';
 import styles from './CartDrawer.module.css';
 
 const WHATSAPP_NUMBER = '2349016946854';
@@ -98,10 +98,14 @@ export default function CartDrawer() {
     // 1. Construct formatted WhatsApp order receipt
     const itemsText = items
       .map(
-        (it, idx) =>
-          `${idx + 1}. *${it.product.name}* (${it.product.brand === 'asa' ? 'Àṣà' : 'Dofit'})\n` +
-          `   • Size: *${it.selectedSize || 'M'}* | Qty: *${it.quantity}*\n` +
-          `   • Price: ₦${(it.product.price * it.quantity).toLocaleString()}`
+        (it, idx) => {
+          const unitPrice = getItemPrice(it);
+          return (
+            `${idx + 1}. *${it.product.name}* (${it.product.brand === 'asa' ? 'Àṣà' : 'Dofit'})\n` +
+            `   • Size: *${it.selectedSize || 'M'}* | Qty: *${it.quantity}*\n` +
+            `   • Price: ₦${(unitPrice * it.quantity).toLocaleString()}`
+          );
+        }
       )
       .join('\n\n');
 
@@ -143,16 +147,19 @@ export default function CartDrawer() {
             state: formData.state,
             notes: formData.notes,
           },
-          items: items.map((it) => ({
-            productId: it.product.id,
-            name: it.product.name,
-            brand: it.product.brand,
-            size: it.selectedSize || 'M',
-            quantity: it.quantity,
-            unitPrice: it.product.price,
-            totalPrice: it.product.price * it.quantity,
-            image: it.product.images[0],
-          })),
+          items: items.map((it) => {
+            const unitPrice = getItemPrice(it);
+            return {
+              productId: it.product.id,
+              name: it.product.name,
+              brand: it.product.brand,
+              size: it.selectedSize || 'M',
+              quantity: it.quantity,
+              unitPrice: unitPrice,
+              totalPrice: unitPrice * it.quantity,
+              image: it.product.images[0],
+            };
+          }),
           subtotal,
           discount,
           deliveryFee: 0,
@@ -300,7 +307,7 @@ export default function CartDrawer() {
                           </div>
 
                           <div className={styles.itemPrice}>
-                            ₦{(item.product.price * item.quantity).toLocaleString()}
+                            ₦{(getItemPrice(item) * item.quantity).toLocaleString()}
                           </div>
                         </div>
                       </div>

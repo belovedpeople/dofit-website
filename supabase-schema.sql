@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   care JSONB DEFAULT '[]'::jsonb,
   colors JSONB DEFAULT '[]'::jsonb,
   sizes JSONB DEFAULT '[]'::jsonb,
+  size_prices JSONB DEFAULT '{}'::jsonb,
   images JSONB DEFAULT '[]'::jsonb,
   videos JSONB DEFAULT '[]'::jsonb,
   in_stock BOOLEAN DEFAULT true,
@@ -86,5 +87,7 @@ CREATE POLICY "Public access for showcase" ON public.showcase_content
 DROP POLICY IF EXISTS "Public access for vouchers" ON public.vouchers;
 CREATE POLICY "Public access for vouchers" ON public.vouchers
   FOR ALL USING (true) WITH CHECK (true);
+
+ALTER TABLE IF EXISTS public.products ADD COLUMN IF NOT EXISTS size_prices JSONB DEFAULT '{}'::jsonb;
 
 NOTIFY pgrst, 'reload schema';

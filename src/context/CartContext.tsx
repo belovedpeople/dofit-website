@@ -28,6 +28,18 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const FREE_SHIPPING_THRESHOLD = 75000; // ₦75,000 for free delivery
 
+export function getItemPrice(item: { product: Product; selectedSize?: string }): number {
+  if (
+    item.product.sizePrices &&
+    item.selectedSize &&
+    typeof item.product.sizePrices[item.selectedSize] === 'number' &&
+    item.product.sizePrices[item.selectedSize] > 0
+  ) {
+    return item.product.sizePrices[item.selectedSize];
+  }
+  return item.product.price;
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -118,7 +130,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => setItems([]);
 
   const totalCount = items.reduce((acc, item) => acc + item.quantity, 0);
-  const subtotal = items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+  const subtotal = items.reduce((acc, item) => acc + getItemPrice(item) * item.quantity, 0);
 
   return (
     <CartContext.Provider

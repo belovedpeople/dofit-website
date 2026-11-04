@@ -13,6 +13,7 @@ export interface Product {
   care: string[];
   colors: { name: string; hex: string }[];
   sizes: string[];
+  sizePrices?: Record<string, number>;
   images: string[];
   videos?: string[];
   inStock: boolean;

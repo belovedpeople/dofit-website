@@ -524,6 +524,33 @@
   transition: all 0.2s ease;
 }
 
+.asaTheme .addBtn {
+  background: var(--asa-gold, #E8A020) !important;
+  color: #0A0A0C !important;
+  border-color: var(--asa-gold, #E8A020) !important;
+  font-weight: 800;
+  box-shadow: 0 4px 20px rgba(232, 160, 32, 0.35);
+}
+
+.asaTheme .addBtn:hover {
+  background: #f5b035 !important;
+  box-shadow: 0 6px 28px rgba(232, 160, 32, 0.5);
+  transform: translateY(-2px);
+}
+
+.dofitTheme .addBtn {
+  background: var(--pink, #FF1E6A) !important;
+  color: #FFFFFF !important;
+  border-color: var(--pink, #FF1E6A) !important;
+  box-shadow: 0 4px 20px rgba(255, 30, 106, 0.35);
+}
+
+.dofitTheme .addBtn:hover {
+  background: #ff3377 !important;
+  box-shadow: 0 6px 28px rgba(255, 30, 106, 0.5);
+  transform: translateY(-2px);
+}
+
 .addedPulse {
   background: #22C55E !important;
   color: #000 !important;
@@ -1023,10 +1050,82 @@
 /* ======================================================== */
 /* MOBILE SPECIFIC REFINEMENTS */
 /* ======================================================== */
+/* Mobile Sticky Bar: Hidden on Desktop */
+.mobileStickyBar {
+  display: none;
+}
+
 @media (max-width: 960px) {
   .page {
-    padding-bottom: 90px;
+    padding-bottom: 140px;
   }
+
+  .mobileStickyBar {
+    display: flex;
+    position: fixed;
+    bottom: 64px; /* Sits directly above bottom nav or at bottom */
+    left: 12px;
+    right: 12px;
+    z-index: 998;
+    background: rgba(14, 14, 18, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 10px 14px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+  }
+
+  .mobileStickyBarAsa {
+    background: rgba(10, 10, 12, 0.95);
+    border-color: rgba(232, 160, 32, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(232, 160, 32, 0.15);
+  }
+
+  .mobileStickyInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .mobileStickyPrice {
+    font-size: 16px;
+    font-weight: 800;
+    color: #FFFFFF;
+    font-family: var(--font-body);
+  }
+
+  .mobileStickyBarAsa .mobileStickyPrice {
+    color: var(--asa-gold, #E8A020);
+  }
+
+  .mobileStickyMeta {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .mobileStickyBtn {
+    height: 42px;
+    padding: 0 18px;
+    font-size: 12.5px;
+    font-weight: 800;
+    border-radius: 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .mobileStickyBarAsa .mobileStickyBtn {
+    background: var(--asa-gold, #E8A020) !important;
+    color: #0A0A0C !important;
+  }
+
 
   .main {
     padding-top: 104px;

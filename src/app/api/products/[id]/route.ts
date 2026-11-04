@@ -44,9 +44,9 @@ export async function PUT(
       id: existing?.id || id,
       slug: body.name
         ? body.name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/(^-|-$)/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/(^-|-$)/g, '')
         : (existing?.slug || id),
       formattedPrice:
         body.price !== undefined
@@ -54,14 +54,24 @@ export async function PUT(
           : (existing?.formattedPrice || `₦${Number(body.price || 0).toLocaleString()}`),
       price: body.price !== undefined ? Number(body.price) : (existing?.price || 0),
       stockCount: body.stockCount !== undefined ? Number(body.stockCount) : (existing?.stockCount || 0),
+      sizePrices: body.sizePrices !== undefined ? body.sizePrices : existing?.sizePrices,
     };
 
     if (isSupabaseConfigured && supabase) {
       const row = mapProductToRow(updated);
-      const { error } = await supabase
+      let { error } = await supabase
         .from('products')
         .update(row)
         .eq('id', id);
+
+      if (error && error.message?.includes('size_prices')) {
+        const { size_prices: _, ...rowWithoutSizePrices } = row;
+        const retry = await supabase
+          .from('products')
+          .update(rowWithoutSizePrices)
+          .eq('id', id);
+        error = retry.error;
+      }
 
       if (error) {
         console.error('Supabase update error:', error);
