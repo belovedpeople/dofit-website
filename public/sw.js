@@ -1,6 +1,6 @@
 // Dofit Wears & Àṣà PWA Service Worker
-// Implements Network-First for dynamic pages & Stale-While-Revalidate for cached assets
-const CACHE_NAME = 'dofit-pwa-v2';
+// Implements Network-First for dynamic pages & CSS/JS chunks, with Cache fallback
+const CACHE_NAME = 'dofit-pwa-v4';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
@@ -27,6 +27,7 @@ self.addEventListener('activate', (event) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log('Purging legacy PWA cache:', key);
             return caches.delete(key);
           }
         })
@@ -71,7 +72,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Static Assets (Images, scripts, fonts): Stale-While-Revalidate
+  // 2. Static Assets (Images, scripts, fonts, CSS)
   if (
     url.origin === self.location.origin &&
     (url.pathname.startsWith('/images') ||
@@ -81,6 +82,9 @@ self.addEventListener('fetch', (event) => {
       url.pathname.endsWith('.css') ||
       url.pathname.endsWith('.js'))
   ) {
+    // For CSS stylesheets and JS chunks, use Network-First to guarantee fresh styling
+    const isStyleOrChunk = url.pathname.endsWith('.css') || url.pathname.includes('/chunks/');
+
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         const fetchPromise = fetch(event.request)
@@ -92,9 +96,14 @@ self.addEventListener('fetch', (event) => {
               });
             }
             return networkResponse;
-          })
-          .catch(() => cachedResponse);
+          });
 
+        if (isStyleOrChunk) {
+          // Network first, fall back to cached version if offline
+          return fetchPromise.catch(() => cachedResponse);
+        }
+
+        // Stale-while-revalidate for images & other media
         return cachedResponse || fetchPromise;
       })
     );

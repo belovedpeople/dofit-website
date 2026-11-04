@@ -46,6 +46,11 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
     }
   }, [product]);
 
+  // Reset selected media to 0 whenever navigating to a different product
+  useEffect(() => {
+    setSelectedMediaIndex(0);
+  }, [slug]);
+
   // Lock body scroll when lightbox is active
   useEffect(() => {
     if (lightboxOpen) {
@@ -177,9 +182,25 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
         </div>
 
         {/* Product Showcase */}
-        <section className={`wrap ${styles.productGrid}`}>
+        <section
+          className={`wrap ${styles.productGrid}`}
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            minWidth: 0,
+            boxSizing: 'border-box',
+          }}
+        >
           {/* Left: Gallery (Photos + Videos) */}
-          <div className={styles.gallery}>
+          <div
+            className={styles.gallery}
+            style={{
+              width: '100%',
+              maxWidth: '100%',
+              minWidth: 0,
+              boxSizing: 'border-box',
+            }}
+          >
             {/* Main Stage */}
             <div
               className={styles.mainImageWrap}
@@ -188,7 +209,19 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                   handleOpenLightbox(selectedMediaIndex);
                 }
               }}
-              style={{ cursor: currentMedia.type === 'image' ? 'zoom-in' : 'default' }}
+              style={{
+                cursor: currentMedia.type === 'image' ? 'zoom-in' : 'default',
+                width: '100%',
+                maxWidth: '100%',
+                height: 'clamp(340px, 62vh, 520px)',
+                maxHeight: '68vh',
+                overflow: 'hidden',
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxSizing: 'border-box',
+              }}
             >
               {currentMedia.type === 'video' ? (
                 <video
@@ -199,6 +232,16 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                   loop
                   playsInline
                   className={styles.mainVideo}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    objectPosition: 'center',
+                    display: 'block',
+                    margin: 'auto',
+                  }}
                 />
               ) : (
                 <>
@@ -208,6 +251,16 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                     src={currentMedia.url}
                     alt={product.name}
                     className={styles.mainImage}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      maxWidth: '100%',
+                      maxHeight: '100%',
+                      objectFit: 'contain',
+                      objectPosition: 'center',
+                      display: 'block',
+                      margin: 'auto',
+                    }}
                     loading="eager"
                   />
                   <button
@@ -262,7 +315,15 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
           </div>
 
           {/* Right: Info & Controls */}
-          <div className={styles.infoCol}>
+          <div
+            className={styles.infoCol}
+            style={{
+              minWidth: 0,
+              width: '100%',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
             <div className={styles.brandRow}>
               <span className={isAsa ? styles.brandBadgeAsa : styles.brandBadgeDofit}>
                 {isAsa ? 'Àṣà by Dofit · Cultural Couture' : 'Dofit Wears · Performance'}
