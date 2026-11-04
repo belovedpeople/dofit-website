@@ -123,6 +123,33 @@ export default function AdminTeamPage() {
     }
   };
 
+  const handleResetPassword = async (member: StaffUser) => {
+    const newPass = window.prompt(`Enter new login password for ${member.name} (${member.email}):`);
+    if (!newPass) return;
+    if (newPass.length < 6) {
+      alert('Password must be at least 6 characters long.');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'reset-password',
+          id: member.id,
+          email: member.email,
+          password: newPass,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update password');
+      alert(`Password updated for ${member.name}! They can now log in with this password.`);
+      fetchTeam();
+    } catch (err: any) {
+      alert(err?.message || 'Error updating password');
+    }
+  };
+
   return (
     <div>
       {/* Header and Add Button */}
@@ -262,26 +289,45 @@ export default function AdminTeamPage() {
                         </span>
                       </td>
                       <td>
-                        {isMaster ? (
-                          <span style={{ fontSize: '11px', opacity: 0.4 }}>Permanent</span>
-                        ) : (
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                           <button
                             type="button"
-                            onClick={() => handleRevoke(member.id, member.email)}
+                            onClick={() => handleResetPassword(member)}
                             style={{
-                              background: 'none',
-                              border: '1px solid rgba(239, 68, 68, 0.3)',
-                              color: '#EF4444',
+                              background: 'rgba(56, 189, 248, 0.1)',
+                              border: '1px solid rgba(56, 189, 248, 0.3)',
+                              color: '#38BDF8',
                               padding: '4px 10px',
                               borderRadius: '6px',
                               cursor: 'pointer',
-                              fontSize: '12px',
+                              fontSize: '11.5px',
+                              fontWeight: 600,
                             }}
-                            title="Revoke Admin Access"
+                            title="Set or Change Login Password"
                           >
-                            Revoke Access
+                            🔑 Set Password
                           </button>
-                        )}
+                          {isMaster ? (
+                            <span style={{ fontSize: '11px', opacity: 0.4 }}>Permanent Owner</span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleRevoke(member.id, member.email)}
+                              style={{
+                                background: 'none',
+                                border: '1px solid rgba(239, 68, 68, 0.3)',
+                                color: '#EF4444',
+                                padding: '4px 10px',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                fontSize: '11.5px',
+                              }}
+                              title="Revoke Admin Access"
+                            >
+                              Revoke
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );

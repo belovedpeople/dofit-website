@@ -65,13 +65,38 @@ CREATE TABLE IF NOT EXISTS public.vouchers (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Enable Row Level Security (RLS)
+-- 5. Create ADMIN_USERS table
+CREATE TABLE IF NOT EXISTS public.admin_users (
+  id TEXT PRIMARY KEY,
+  email TEXT UNIQUE NOT NULL,
+  password TEXT NOT NULL,
+  name TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'Store Admin',
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  last_login TIMESTAMPTZ
+);
+
+-- 6. Create PWA_BROADCASTS table
+CREATE TABLE IF NOT EXISTS public.pwa_broadcasts (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  url TEXT DEFAULT '/shop',
+  tag TEXT,
+  category TEXT DEFAULT 'Drop Alert',
+  sender_name TEXT DEFAULT 'Admin',
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 7. Enable Row Level Security (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.showcase_content ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.vouchers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.admin_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pwa_broadcasts ENABLE ROW LEVEL SECURITY;
 
--- 6. Allow public access
+-- 8. Allow public access
 DROP POLICY IF EXISTS "Public access for products" ON public.products;
 CREATE POLICY "Public access for products" ON public.products
   FOR ALL USING (true) WITH CHECK (true);
@@ -88,6 +113,21 @@ DROP POLICY IF EXISTS "Public access for vouchers" ON public.vouchers;
 CREATE POLICY "Public access for vouchers" ON public.vouchers
   FOR ALL USING (true) WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public access for admin_users" ON public.admin_users;
+CREATE POLICY "Public access for admin_users" ON public.admin_users
+  FOR ALL USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public access for pwa_broadcasts" ON public.pwa_broadcasts;
+CREATE POLICY "Public access for pwa_broadcasts" ON public.pwa_broadcasts
+  FOR ALL USING (true) WITH CHECK (true);
+
 ALTER TABLE IF EXISTS public.products ADD COLUMN IF NOT EXISTS size_prices JSONB DEFAULT '{}'::jsonb;
+
+-- Seed default master admins
+INSERT INTO public.admin_users (id, email, password, name, role)
+VALUES 
+  ('admin-master', 'brainwerkin@gmail.com', 'dofit2026admin', 'Lead Administrator', 'Super Admin'),
+  ('admin-dolapo', 'dolapo@dofit.fit', 'dofit2026admin', 'Dolapo', 'Super Admin')
+ON CONFLICT (email) DO NOTHING;
 
 NOTIFY pgrst, 'reload schema';

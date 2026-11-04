@@ -4,7 +4,9 @@ import {
   getAllAdminUsers,
   addAdminUser,
   deleteAdminUser,
+  updateAdminPassword,
   adminUsersStore,
+  AdminUser,
 } from '@/data/adminUsers';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
@@ -23,8 +25,25 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized access' }, { status: 401 });
   }
 
-  // 1. Try fetching from Supabase if configured
+  // 1. Try fetching from Supabase showcase_content store (guaranteed persistent)
   if (isSupabaseConfigured && supabase) {
+    try {
+      const { data } = await supabase
+        .from('showcase_content')
+        .select('content')
+        .eq('id', 'admin_team_store')
+        .maybeSingle();
+
+      if (data?.content && Array.isArray(data.content) && data.content.length > 0) {
+        adminUsersStore.length = 0;
+        data.content.forEach((u: AdminUser) => adminUsersStore.push(u));
+        return NextResponse.json({ success: true, users: getAllAdminUsers() });
+      }
+    } catch (err) {
+      console.warn('Supabase showcase team sync warning:', err);
+    }
+
+    // 2. Also check admin_users table
     try {
       const { data, error } = await supabase
         .from('admin_users')
@@ -44,7 +63,7 @@ export async function GET() {
   return NextResponse.json({ success: true, users });
 }
 
-// POST /api/admin-users — add a new admin or worker
+// POST /api/admin-users — add staff member or reset password
 export async function POST(request: NextRequest) {
   const authed = await isAuthenticatedAdmin();
   if (!authed) {
@@ -53,7 +72,27 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { email, password, name, role } = body;
+    const { action, email, password, name, role, id } = body;
+
+    // Password reset action
+    if (action === 'reset-password' && (id || email) && password) {
+      if (password.length < 6) {
+        return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
+      }
+      updateAdminPassword(id || email, password);
+      if (isSupabaseConfigured && supabase) {
+        try {
+          await supabase.from('showcase_content').upsert({
+            id: 'admin_team_store',
+            content: adminUsersStore,
+            updated_at: new Date().toISOString(),
+          });
+        } catch {
+          // ignore
+        }
+      }
+      return NextResponse.json({ success: true, message: 'Password updated successfully' });
+    }
 
     if (!email || !password) {
       return NextResponse.json(
@@ -79,8 +118,19 @@ export async function POST(request: NextRequest) {
       role: role || 'Store Admin',
     });
 
-    // 2. Persist to Supabase if configured
+    // 2. Persist to Supabase showcase_content store (guaranteed persistence across serverless invocations)
     if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('showcase_content').upsert({
+          id: 'admin_team_store',
+          content: adminUsersStore,
+          updated_at: new Date().toISOString(),
+        });
+      } catch (err) {
+        console.warn('Supabase showcase_content team upsert warning:', err);
+      }
+
+      // Also try dedicated admin_users table
       try {
         await supabase.from('admin_users').upsert(
           {
@@ -135,6 +185,16 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('showcase_content').upsert({
+          id: 'admin_team_store',
+          content: adminUsersStore,
+          updated_at: new Date().toISOString(),
+        });
+      } catch {
+        // ignore
+      }
+
       try {
         await supabase.from('admin_users').delete().eq('id', id);
       } catch (err) {

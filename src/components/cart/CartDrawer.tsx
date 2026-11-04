@@ -1,11 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart, getItemPrice } from '@/context/CartContext';
 import styles from './CartDrawer.module.css';
 
-const WHATSAPP_NUMBER = '2349016946854';
+const DEFAULT_WHATSAPP = '2349016946854';
 
 export default function CartDrawer() {
   const {
@@ -26,6 +26,32 @@ export default function CartDrawer() {
   const [promoSuccess, setPromoSuccess] = useState('');
   const [appliedVoucher, setAppliedVoucher] = useState('');
   const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  const [storeSettings, setStoreSettings] = useState<{
+    allowOrders: boolean;
+    ordersPausedMessage: string;
+    whatsappNumber: string;
+  }>({
+    allowOrders: true,
+    ordersPausedMessage: 'Orders are momentarily paused for live dispatch processing.',
+    whatsappNumber: DEFAULT_WHATSAPP,
+  });
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.settings) {
+          setStoreSettings({
+            allowOrders: data.settings.allowOrders !== undefined ? data.settings.allowOrders : true,
+            ordersPausedMessage:
+              data.settings.ordersPausedMessage ||
+              'Orders are momentarily paused for live dispatch processing.',
+            whatsappNumber: data.settings.whatsappNumber || DEFAULT_WHATSAPP,
+          });
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Steps: 'cart' | 'checkout' | 'success'
   const [step, setStep] = useState<'cart' | 'checkout' | 'success'>('cart');
@@ -173,8 +199,8 @@ export default function CartDrawer() {
       console.error('Failed to log order to admin API:', err);
     }
 
-    // 3. Open WhatsApp directly to +2349016946854
-    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(waMessage)}`;
+    // 3. Open WhatsApp directly to configured router number
+    const waUrl = `https://wa.me/${storeSettings.whatsappNumber || DEFAULT_WHATSAPP}?text=${encodeURIComponent(waMessage)}`;
     window.open(waUrl, '_blank');
 
     setIsSubmitting(false);
@@ -351,14 +377,32 @@ export default function CartDrawer() {
                   <span className={styles.grandPrice}>₦{grandTotal.toLocaleString()}</span>
                 </div>
 
-                {/* Switch to WhatsApp Details Step */}
-                <button
-                  className="btn btn-pink"
-                  style={{ width: '100%', padding: '16px 24px', fontSize: '15px' }}
-                  onClick={() => setStep('checkout')}
-                >
-                  Proceed to Checkout · ₦{grandTotal.toLocaleString()}
-                </button>
+                {/* Switch to WhatsApp Details Step or Paused Message */}
+                {storeSettings.allowOrders ? (
+                  <button
+                    className="btn btn-pink"
+                    style={{ width: '100%', padding: '16px 24px', fontSize: '15px' }}
+                    onClick={() => setStep('checkout')}
+                  >
+                    Proceed to Checkout · ₦{grandTotal.toLocaleString()}
+                  </button>
+                ) : (
+                  <div
+                    style={{
+                      background: 'rgba(234, 179, 8, 0.15)',
+                      border: '1px solid rgba(234, 179, 8, 0.3)',
+                      color: '#EAB308',
+                      padding: '14px 18px',
+                      borderRadius: '8px',
+                      textAlign: 'center',
+                      fontSize: '13px',
+                      lineHeight: 1.5,
+                      fontWeight: 600,
+                    }}
+                  >
+                    ⏸ {storeSettings.ordersPausedMessage}
+                  </div>
+                )}
 
                 <div className={styles.trustBadges}>
                   <span>🟢 WhatsApp Order Routing</span>
@@ -379,7 +423,7 @@ export default function CartDrawer() {
               </div>
               <h2 className={styles.checkoutTitle}>Delivery Details</h2>
               <p className={styles.checkoutSubtitle}>
-                No login required. Enter your delivery info and your order will open automatically on WhatsApp (+2349016946854).
+                No login required. Enter your delivery info and your order will open automatically on WhatsApp (+{storeSettings.whatsappNumber}).
               </p>
             </div>
 
@@ -522,7 +566,7 @@ export default function CartDrawer() {
               <button
                 className={styles.waOrderBtn}
                 onClick={() => {
-                  const url = `https://wa.me/${WHATSAPP_NUMBER}`;
+                  const url = `https://wa.me/${storeSettings.whatsappNumber || DEFAULT_WHATSAPP}`;
                   window.open(url, '_blank');
                 }}
               >

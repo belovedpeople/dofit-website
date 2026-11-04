@@ -19,6 +19,14 @@ export let adminUsersStore: AdminUser[] = [
     role: 'Super Admin',
     createdAt: '2026-01-01T00:00:00.000Z',
   },
+  {
+    id: 'admin-dolapo',
+    email: 'dolapo@dofit.fit',
+    password: 'dofit2026admin',
+    name: 'Dolapo',
+    role: 'Super Admin',
+    createdAt: '2026-11-04T00:00:00.000Z',
+  },
 ];
 
 export function getAllAdminUsers(): Omit<AdminUser, 'password'>[] {
@@ -92,6 +100,18 @@ export function addAdminUser(data: {
   adminUsersStore.push(newUser);
   const { password: _, ...safeNew } = newUser;
   return { user: safeNew, isNew: true };
+}
+
+export function updateAdminPassword(emailOrId: string, newPass: string): boolean {
+  const clean = emailOrId.trim().toLowerCase();
+  const user = adminUsersStore.find(
+    (u) => u.id === emailOrId || u.email.toLowerCase() === clean
+  );
+  if (user) {
+    user.password = newPass;
+    return true;
+  }
+  return false;
 }
 
 export function deleteAdminUser(id: string): boolean {

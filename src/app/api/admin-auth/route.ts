@@ -45,7 +45,43 @@ export async function POST(request: NextRequest) {
             .eq('id', data.id);
         }
       } catch (err) {
-        console.warn('Supabase admin-auth lookup error, checking local store:', err);
+        console.warn('Supabase admin-auth lookup error, checking team store:', err);
+      }
+
+      // 1b. Check in showcase_content ('admin_team_store') which is always available
+      if (!authUser) {
+        try {
+          const { data } = await supabase
+            .from('showcase_content')
+            .select('content')
+            .eq('id', 'admin_team_store')
+            .maybeSingle();
+
+          if (data?.content && Array.isArray(data.content)) {
+            const matched = data.content.find(
+              (u: any) =>
+                u.email?.toLowerCase() === cleanEmail && u.password === password
+            );
+
+            if (matched) {
+              authUser = {
+                id: matched.id,
+                email: matched.email,
+                name: matched.name,
+                role: matched.role,
+              };
+
+              // Update lastLogin in the store
+              matched.lastLogin = new Date().toISOString();
+              await supabase
+                .from('showcase_content')
+                .update({ content: data.content, updated_at: new Date().toISOString() })
+                .eq('id', 'admin_team_store');
+            }
+          }
+        } catch (scErr) {
+          console.warn('showcase_content auth lookup note:', scErr);
+        }
       }
     }
 

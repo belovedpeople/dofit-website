@@ -17,6 +17,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/notifications', label: 'Push Notifications', icon: '🔔' },
     { href: '/admin/team', label: 'Team & Staff', icon: '👥' },
     { href: '/admin/content-cms', label: 'Content CMS', icon: '🖊' },
+    { href: '/admin/settings', label: 'Store Override & Settings', icon: '⚙️' },
   ];
 
   return (
