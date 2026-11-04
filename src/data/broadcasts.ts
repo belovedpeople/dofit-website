@@ -9,28 +9,11 @@ export interface BroadcastNotification {
   senderName?: string;
 }
 
-export let broadcastsStore: BroadcastNotification[] = [
-  {
-    id: 'broadcast-1',
-    title: '🔥 Midnight Charcoal Restock Live!',
-    body: 'The 2-Piece Long-Sleeve Leggings Set is back in all sizes. Claim yours before it sells out.',
-    url: '/shop?brand=dofit',
-    tag: 'restock-drop',
-    category: 'Restock',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-    senderName: 'Lead Admin',
-  },
-  {
-    id: 'broadcast-2',
-    title: '⚡ Secret 20% Voucher for App Users',
-    body: 'Use voucher code DOFIT20 at checkout for ₦10,000+ off your next outfit.',
-    url: '/shop',
-    tag: 'exclusive-voucher',
-    category: 'Exclusive',
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-    senderName: 'Lead Admin',
-  },
-];
+export let broadcastsStore: BroadcastNotification[] = [];
+
+export function setBroadcastsStore(broadcasts: BroadcastNotification[]) {
+  broadcastsStore = broadcasts;
+}
 
 export function getAllBroadcasts(): BroadcastNotification[] {
   return [...broadcastsStore].sort(

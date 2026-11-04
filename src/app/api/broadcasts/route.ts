@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import {
-  getAllBroadcasts,
-  getLatestBroadcast,
-  addBroadcast,
-  deleteBroadcast,
   BroadcastNotification,
+  getAllBroadcasts,
+  setBroadcastsStore,
 } from '@/data/broadcasts';
 import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 const SESSION_COOKIE = 'dofit_admin_session';
+const BROADCAST_STORE_SLUG = 'pwa_broadcasts_store';
 
 async function isAuthenticatedAdmin(): Promise<boolean> {
   const cookieStore = await cookies();
@@ -17,41 +16,62 @@ async function isAuthenticatedAdmin(): Promise<boolean> {
   return Boolean(session?.value);
 }
 
-// GET /api/broadcasts — fetch latest broadcast & history
-export async function GET() {
+// Helper to fetch broadcasts from Supabase showcase_content
+async function getStoredBroadcasts(): Promise<BroadcastNotification[]> {
   if (isSupabaseConfigured && supabase) {
     try {
       const { data, error } = await supabase
-        .from('pwa_broadcasts')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from('showcase_content')
+        .select('content')
+        .eq('slug', BROADCAST_STORE_SLUG)
+        .single();
 
-      if (!error && data && data.length > 0) {
-        const mapped: BroadcastNotification[] = data.map((b) => ({
-          id: b.id,
-          title: b.title,
-          body: b.body,
-          url: b.url || '/shop',
-          tag: b.tag,
-          category: b.category || 'Drop Alert',
-          createdAt: b.created_at,
-          senderName: b.sender_name || 'Admin',
-        }));
-        return NextResponse.json({
-          success: true,
-          latest: mapped[0] || null,
-          broadcasts: mapped,
-        });
+      if (!error && data?.content && Array.isArray(data.content.broadcasts)) {
+        const cleaned = (data.content.broadcasts as BroadcastNotification[]).filter(
+          (b) => b.id !== 'broadcast-1' && b.id !== 'broadcast-2'
+        );
+        setBroadcastsStore(cleaned);
+        return cleaned;
       }
     } catch (err) {
       console.warn('Supabase broadcasts read warning:', err);
     }
   }
+  return getAllBroadcasts().filter((b) => b.id !== 'broadcast-1' && b.id !== 'broadcast-2');
+}
+
+// Helper to persist broadcasts to Supabase showcase_content
+async function persistBroadcasts(list: BroadcastNotification[]): Promise<void> {
+  setBroadcastsStore(list);
+  if (isSupabaseConfigured && supabase) {
+    try {
+      await supabase
+        .from('showcase_content')
+        .upsert(
+          {
+            slug: BROADCAST_STORE_SLUG,
+            content: { broadcasts: list, updatedAt: new Date().toISOString() },
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'slug' }
+        );
+    } catch (err) {
+      console.warn('Supabase broadcasts save warning:', err);
+    }
+  }
+}
+
+// GET /api/broadcasts — fetch latest broadcast & history
+export async function GET() {
+  const broadcasts = await getStoredBroadcasts();
+  const sorted = [...broadcasts].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   return NextResponse.json({
     success: true,
-    latest: getLatestBroadcast(),
-    broadcasts: getAllBroadcasts(),
+    latest: sorted[0] || null,
+    broadcasts: sorted,
   });
 }
 
@@ -73,37 +93,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 1. Add to local store
-    const broadcast = addBroadcast({
-      title,
-      body: messageBody,
-      url,
-      category,
-      senderName,
-    });
+    const currentList = await getStoredBroadcasts();
 
-    // 2. Persist to Supabase if configured
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('pwa_broadcasts').insert({
-          id: broadcast.id,
-          title: broadcast.title,
-          body: broadcast.body,
-          url: broadcast.url,
-          tag: broadcast.tag,
-          category: broadcast.category,
-          sender_name: broadcast.senderName,
-          created_at: broadcast.createdAt,
-        });
-      } catch (err) {
-        console.warn('Supabase broadcast insert warning:', err);
-      }
-    }
+    const newBroadcast: BroadcastNotification = {
+      id: `broadcast-${Date.now()}`,
+      title: title.trim(),
+      body: messageBody.trim(),
+      url: url?.trim() || '/shop',
+      tag: `dofit-${Date.now()}`,
+      category: category || 'Drop Alert',
+      createdAt: new Date().toISOString(),
+      senderName: senderName || 'Admin Desk',
+    };
+
+    const updated = [newBroadcast, ...currentList.filter((b) => b.id !== newBroadcast.id)];
+    await persistBroadcasts(updated);
 
     return NextResponse.json({
       success: true,
       message: 'Push notification broadcasted successfully to all PWA devices and active visitors!',
-      broadcast,
+      broadcast: newBroadcast,
     });
   } catch (err) {
     console.error('Broadcast push error:', err);
@@ -111,7 +120,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE /api/broadcasts?id=... — delete past broadcast
+// DELETE /api/broadcasts?id=... — delete broadcast permanently
 export async function DELETE(request: NextRequest) {
   const isAuthed = await isAuthenticatedAdmin();
   if (!isAuthed) {
@@ -126,20 +135,16 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Broadcast id is required' }, { status: 400 });
     }
 
-    if (isSupabaseConfigured && supabase) {
-      try {
-        await supabase.from('pwa_broadcasts').delete().eq('id', id);
-      } catch (err) {
-        console.warn('Supabase broadcast delete warning:', err);
-      }
-    }
+    const currentList = await getStoredBroadcasts();
+    const updated = currentList.filter((b) => b.id !== id);
+    await persistBroadcasts(updated);
 
-    deleteBroadcast(id);
-
-    return NextResponse.json({ success: true, message: 'Broadcast deleted successfully' });
+    return NextResponse.json({
+      success: true,
+      message: 'Broadcast deleted permanently',
+    });
   } catch (err) {
     console.error('Delete broadcast error:', err);
     return NextResponse.json({ error: 'Failed to delete broadcast' }, { status: 500 });
   }
 }
-

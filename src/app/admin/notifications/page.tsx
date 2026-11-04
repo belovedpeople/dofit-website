@@ -95,6 +95,40 @@ export default function AdminNotificationsPage() {
     }
   };
 
+  const handleTestOnThisDevice = async () => {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
+      alert('This browser does not support Web Notifications.');
+      return;
+    }
+
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        alert('Notification permission was denied. Please allow notifications in your browser/phone settings.');
+        return;
+      }
+
+      if ('serviceWorker' in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        (reg as any).showNotification(title || '🔥 Dofit Drop Alert', {
+          body: body || 'This is how your drop alerts appear in your phone notification bar.',
+          icon: '/images/logo.png',
+          badge: '/images/logo.png',
+          vibrate: [200, 100, 200],
+          data: { url: url || '/shop' },
+        });
+      } else {
+        new Notification(title || '🔥 Dofit Drop Alert', {
+          body: body || 'This is how your drop alerts appear in your phone notification bar.',
+          icon: '/images/logo.png',
+        });
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error triggering test notification.');
+    }
+  };
+
   const setTemplate = (t: string, b: string, u: string, c: 'Drop Alert' | 'Flash Sale' | 'Restock' | 'Exclusive') => {
     setTitle(t);
     setBody(b);
@@ -314,25 +348,48 @@ export default function AdminNotificationsPage() {
             {errorMsg && <p style={{ color: '#EF4444', fontSize: '12.5px', margin: 0 }}>{errorMsg}</p>}
             {successMsg && <p style={{ color: '#34D399', fontSize: '12.5px', margin: 0 }}>✓ {successMsg}</p>}
 
-            <button
-              type="submit"
-              disabled={sending}
-              style={{
-                background: 'linear-gradient(135deg, #FF1E6A, #FF4586)',
-                border: 'none',
-                color: '#fff',
-                padding: '14px 20px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 800,
-                letterSpacing: '0.04em',
-                cursor: 'pointer',
-                boxShadow: '0 4px 20px rgba(255, 30, 106, 0.4)',
-                marginTop: '6px',
-              }}
-            >
-              {sending ? 'Broadcasting Push Notification...' : '🚀 Broadcast to All PWA Users →'}
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
+              <button
+                type="submit"
+                disabled={sending}
+                style={{
+                  background: 'linear-gradient(135deg, #FF1E6A, #FF4586)',
+                  border: 'none',
+                  color: '#fff',
+                  padding: '14px 20px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: 800,
+                  letterSpacing: '0.04em',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 20px rgba(255, 30, 106, 0.4)',
+                }}
+              >
+                {sending ? 'Broadcasting Push Notification...' : '🚀 Broadcast to All PWA Users →'}
+              </button>
+
+              <button
+                type="button"
+                onClick={handleTestOnThisDevice}
+                className={styles.actionBtn}
+                style={{
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  borderColor: 'rgba(56, 189, 248, 0.35)',
+                  color: '#38BDF8',
+                  padding: '10px 16px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                }}
+              >
+                <span>🔔</span>
+                <span>Test Phone Status Bar Notification (On This Device)</span>
+              </button>
+            </div>
           </form>
         </div>
 
