@@ -147,3 +147,4 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to remove admin user' }, { status: 500 });
   }
 }
+

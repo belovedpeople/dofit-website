@@ -488,3 +488,4 @@ export default function AdminTeamPage() {
     </div>
   );
 }
+

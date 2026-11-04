@@ -1,6 +1,7 @@
 // Dofit Wears & Àṣà PWA Service Worker
 // Implements Network-First for dynamic pages & CSS/JS chunks, with Cache fallback
-const CACHE_NAME = 'dofit-pwa-v4';
+// Supports Web Push Notifications & Background Announcements
+const CACHE_NAME = 'dofit-pwa-v5';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
@@ -109,4 +110,66 @@ self.addEventListener('fetch', (event) => {
     );
     return;
   }
+});
+
+// ========================================================
+// PUSH NOTIFICATIONS FOR PWA & INSTALLED APP USERS
+// ========================================================
+self.addEventListener('push', (event) => {
+  let payload = {
+    title: 'Dofit Wears',
+    body: 'New activewear drop available now! Tap to check it out.',
+    url: '/shop',
+    tag: 'dofit-drop',
+  };
+
+  if (event.data) {
+    try {
+      payload = { ...payload, ...event.data.json() };
+    } catch {
+      payload.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: payload.body,
+    icon: '/images/logo.png',
+    badge: '/images/logo.png',
+    tag: payload.tag || 'dofit-drop',
+    vibrate: [200, 100, 200],
+    data: {
+      url: payload.url || '/shop',
+      dateOfArrival: Date.now(),
+    },
+    actions: [
+      { action: 'open', title: 'View Drop 🛍️' },
+      { action: 'close', title: 'Dismiss' },
+    ],
+  };
+
+  event.waitUntil(self.registration.showNotification(payload.title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  if (event.action === 'close') return;
+
+  const targetUrl = event.notification.data?.url || '/shop';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // If store window already open, focus it and navigate
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(targetUrl);
+          return client.focus();
+        }
+      }
+      // Otherwise open a new window/tab
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
 });

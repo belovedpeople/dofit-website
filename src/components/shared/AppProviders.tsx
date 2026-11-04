@@ -9,6 +9,7 @@ import InstallAppModal from '@/components/shared/InstallAppModal';
 import AppSplashScreen from '@/components/shared/AppSplashScreen';
 import AppBottomNav from '@/components/shared/AppBottomNav';
 import UpdateNotification from '@/components/shared/UpdateNotification';
+import PushNotificationBanner from '@/components/shared/PushNotificationBanner';
 import AsaAudioPlayer from '@/components/asa/AsaAudioPlayer';
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
@@ -17,6 +18,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
       <CartProvider>
         <AppSplashScreen />
         <UpdateNotification />
+        <PushNotificationBanner />
         <Cursor />
         {children}
         <WhatsAppFloat />

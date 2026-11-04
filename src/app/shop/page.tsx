@@ -330,8 +330,15 @@ function ShopContent() {
                         </Link>
                       </h3>
 
+                      {/* Pricing and Action Button */}
                       <div className={styles.bottomRow}>
-                        <span className={styles.price}>{p.formattedPrice}</span>
+                        <div className={styles.priceCol}>
+                          <span className={styles.price}>{p.formattedPrice}</span>
+                          <span className={`${styles.stockStatus} ${isOutOfStock ? styles.stockStatusOut : ''}`}>
+                            {isOutOfStock ? '● Sold Out' : '✓ In Stock'}
+                          </span>
+                        </div>
+
                         <button
                           type="button"
                           className={`${styles.quickAddBtn} ${isAsa ? styles.quickAddAsa : styles.quickAddDofit}`}
@@ -339,18 +346,30 @@ function ShopContent() {
                           aria-label={`Quick add ${p.name}`}
                           disabled={isOutOfStock}
                         >
-                          {isOutOfStock ? 'Sold Out' : '+ Bag'}
+                          <span>{isOutOfStock ? 'Sold Out' : '+ Add to Bag'}</span>
                         </button>
                       </div>
 
                       {/* Sizes Preview */}
-                      <div className={styles.sizeRow}>
-                        {p.sizes?.map((s) => (
-                          <span key={s} className={styles.sizePill}>
-                            {s}
-                          </span>
-                        ))}
-                      </div>
+                      {p.sizes && p.sizes.length > 0 && (
+                        <div className={styles.sizeRow}>
+                          <span className={styles.sizeLabel}>Sizes:</span>
+                          {p.sizes.map((s) => (
+                            <button
+                              key={s}
+                              type="button"
+                              className={styles.sizePill}
+                              onClick={() => {
+                                setQuickSize(s);
+                                handleQuickAdd(p);
+                              }}
+                              title={`Select size ${s}`}
+                            >
+                              {s}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

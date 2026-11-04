@@ -105,3 +105,4 @@ export function deleteAdminUser(id: string): boolean {
   adminUsersStore = adminUsersStore.filter((u) => u.id !== id);
   return adminUsersStore.length < initial;
 }
+

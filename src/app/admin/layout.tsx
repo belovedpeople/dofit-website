@@ -14,6 +14,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/analytics', label: 'Analytics', icon: '📈' },
     { href: '/admin/vouchers', label: 'Vouchers & Promos', icon: '🎟️' },
     { href: '/admin/subscribers', label: 'Subscribers (VIP)', icon: '📬' },
+    { href: '/admin/notifications', label: 'Push Notifications', icon: '🔔' },
     { href: '/admin/team', label: 'Team & Staff', icon: '👥' },
     { href: '/admin/content-cms', label: 'Content CMS', icon: '🖊' },
   ];
