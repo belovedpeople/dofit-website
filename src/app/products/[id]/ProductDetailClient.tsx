@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Product } from '@/data/products';
@@ -49,6 +48,8 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
   // Reset selected media to 0 whenever navigating to a different product
   useEffect(() => {
     setSelectedMediaIndex(0);
+    setLightboxOpen(false);
+    setZoomLevel(1);
   }, [slug]);
 
   // Lock body scroll when lightbox is active
@@ -344,8 +345,8 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                 {isOutOfStock
                   ? '🔴 Currently Out of Stock'
                   : product.stockCount <= 5
-                  ? `🔥 Only ${product.stockCount} left in stock`
-                  : '✓ In Stock (Ready to Ship)'}
+                    ? `🔥 Only ${product.stockCount} left in stock`
+                    : '✓ In Stock (Ready to Ship)'}
               </span>
             </div>
 
@@ -437,8 +438,8 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                 {isOutOfStock
                   ? 'SOLD OUT'
                   : addedAnimation
-                  ? '✓ ADDED TO BAG'
-                  : `ADD TO BAG · ${product.formattedPrice}`}
+                    ? '✓ ADDED TO BAG'
+                    : `ADD TO BAG · ${product.formattedPrice}`}
               </button>
             </div>
 
@@ -551,13 +552,12 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                   className={styles.relatedCard}
                 >
                   <div className={styles.relatedImgWrap}>
-                    <Image
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
                       src={rel.images[0] || '/images/dofit-wears/2-Piece Biker Short Set.png'}
                       alt={rel.name}
-                      fill
                       className={styles.relatedImg}
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      unoptimized={rel.images[0]?.startsWith('http')}
+                      loading="lazy"
                     />
                   </div>
                   <div className={styles.relatedInfo}>
