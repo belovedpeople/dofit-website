@@ -2,11 +2,12 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import AdminAuthGate from '@/components/admin/AdminAuthGate';
+import AdminAuthGate, { useAdminAuth } from '@/components/admin/AdminAuthGate';
 import styles from './admin.module.css';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user, logout } = useAdminAuth();
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   useEffect(() => {
@@ -29,190 +30,260 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const currentNav = navItems.find((i) => i.href === pathname);
 
   return (
-    <AdminAuthGate>
-      <div className={styles.adminContainer}>
-        {/* Mobile Topbar */}
-        <header className={styles.mobileHeader}>
-          <Link href="/admin" className={styles.mobileHeaderBrand}>
-            <span className={styles.logoDot} />
-            <span>DOFIT ADMIN</span>
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', maxWidth: '120px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {currentNav?.label || 'Console'}
-            </span>
-            <button
-              type="button"
-              className={styles.mobileMenuBtn}
-              onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
-              aria-label="Toggle admin navigation menu"
-            >
-              {mobileDrawerOpen ? '✕' : '☰'}
-            </button>
-          </div>
-        </header>
+    <div className={styles.adminContainer}>
+      {/* Mobile Topbar */}
+      <header className={styles.mobileHeader}>
+        <Link href="/admin" className={styles.mobileHeaderBrand}>
+          <span className={styles.logoDot} />
+          <span>DOFIT ADMIN</span>
+        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {/* Quick 1-Tap Logout on Mobile Header */}
+          <button
+            type="button"
+            className={styles.mobileLogoutHeaderBtn}
+            onClick={logout}
+            title="Log Out of Admin Console"
+            aria-label="Log Out of Admin"
+          >
+            <span>🚪</span>
+            <span>Exit</span>
+          </button>
+          <button
+            type="button"
+            className={styles.mobileMenuBtn}
+            onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
+            aria-label="Toggle admin navigation menu"
+          >
+            {mobileDrawerOpen ? '✕' : '☰'}
+          </button>
+        </div>
+      </header>
 
-        {/* Mobile Slide-Out Navigation Drawer */}
-        {mobileDrawerOpen && (
-          <div
-            className={styles.mobileDrawerOverlay}
-            onClick={() => setMobileDrawerOpen(false)}
-          />
-        )}
+      {/* Mobile Slide-Out Navigation Drawer */}
+      {mobileDrawerOpen && (
         <div
-          className={styles.mobileDrawer}
-          style={{
-            transform: mobileDrawerOpen ? 'translateX(0)' : 'translateX(-100%)',
-            transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-        >
-          <div className={styles.mobileDrawerHeader}>
-            <div className={styles.brandLogo} style={{ fontSize: '20px' }}>
-              <span className={styles.logoDot} />
-              DOFIT WEARS
-            </div>
-            <button
-              type="button"
-              className={styles.mobileDrawerClose}
-              onClick={() => setMobileDrawerOpen(false)}
-            >
-              ✕
-            </button>
+          className={styles.mobileDrawerOverlay}
+          onClick={() => setMobileDrawerOpen(false)}
+        />
+      )}
+      <div
+        className={styles.mobileDrawer}
+        style={{
+          transform: mobileDrawerOpen ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        <div className={styles.mobileDrawerHeader}>
+          <div className={styles.brandLogo} style={{ fontSize: '20px' }}>
+            <span className={styles.logoDot} />
+            DOFIT WEARS
           </div>
-
-          <nav className={styles.nav}>
-            <span className={styles.navSectionLabel}>Core Operations</span>
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-                  onClick={() => setMobileDrawerOpen(false)}
-                >
-                  <span style={{ fontSize: '18px' }}>{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className={styles.sidebarFooter} style={{ marginTop: 'auto', paddingTop: '16px' }}>
-            <Link href="/" className={styles.storeLink} target="_blank">
-              <span>🌐</span>
-              <span>View Public Storefront</span>
-            </Link>
-            <Link href="/asa" className={styles.storeLink} target="_blank">
-              <span>🎨</span>
-              <span>View Àṣà Couture</span>
-            </Link>
-          </div>
+          <button
+            type="button"
+            className={styles.mobileDrawerClose}
+            onClick={() => setMobileDrawerOpen(false)}
+          >
+            ✕
+          </button>
         </div>
 
-        {/* Desktop Sidebar (hidden on mobile via CSS) */}
-        <aside className={styles.sidebar}>
-          <div className={styles.sidebarHeader}>
-            <div className={styles.brandLogo}>
-              <span className={styles.logoDot} />
-              DOFIT WEARS
+        <nav className={styles.nav}>
+          <span className={styles.navSectionLabel}>Core Operations</span>
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
+                onClick={() => setMobileDrawerOpen(false)}
+              >
+                <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Public Storefront Links */}
+        <div className={styles.sidebarFooter} style={{ marginTop: 'auto', paddingTop: '16px' }}>
+          <Link href="/" className={styles.storeLink} target="_blank">
+            <span>🌐</span>
+            <span>View Public Storefront</span>
+          </Link>
+          <Link href="/asa" className={styles.storeLink} target="_blank">
+            <span>🎨</span>
+            <span>View Àṣà Couture</span>
+          </Link>
+        </div>
+
+        {/* Mobile Drawer Profile & Full Logout Button */}
+        <div className={styles.mobileDrawerProfile}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className={styles.profileAvatar}>
+              {user?.name ? user.name[0].toUpperCase() : 'A'}
             </div>
-            <span className={styles.brandBadgeAdmin}>ADMIN CONTROL</span>
-          </div>
-
-          <nav className={styles.nav}>
-            <span className={styles.navSectionLabel}>Core Operations</span>
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
-                >
-                  <span>{item.icon}</span>
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className={styles.sidebarFooter}>
-            <Link href="/" className={styles.storeLink} target="_blank">
-              <span>🌐</span>
-              <span>View Public Storefront</span>
-            </Link>
-            <Link href="/asa" className={styles.storeLink} target="_blank">
-              <span>🎨</span>
-              <span>View Àṣà Couture</span>
-            </Link>
-          </div>
-        </aside>
-
-        {/* Main content wrapper */}
-        <div className={styles.main}>
-          {/* Desktop Topbar */}
-          <header className={styles.topbar}>
-            <h1 className={styles.pageHeaderTitle}>
-              {currentNav?.label || 'Management Console'}
-            </h1>
-            <div className={styles.topbarActions}>
-              <div className={styles.statusPill}>
-                <span className={styles.statusPulse} />
-                <span>WhatsApp Router: +2349016946854</span>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user?.name || 'Administrator'}
+              </div>
+              <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user?.email || 'admin@dofit.fit'}
               </div>
             </div>
-          </header>
-
-          {/* View content */}
-          <main className={styles.contentView}>{children}</main>
-        </div>
-
-        {/* Mobile Bottom Dock Navigation (Quick Thumb Switching) */}
-        <nav className={styles.mobileBottomNav} aria-label="Mobile Admin Navigation">
-          <Link
-            href="/admin"
-            className={`${styles.mobileBottomTab} ${pathname === '/admin' ? styles.mobileBottomTabActive : ''}`}
-          >
-            <span className={styles.mobileBottomTabIcon}>📊</span>
-            <span>Dashboard</span>
-          </Link>
-
-          <Link
-            href="/admin/products"
-            className={`${styles.mobileBottomTab} ${pathname === '/admin/products' ? styles.mobileBottomTabActive : ''}`}
-          >
-            <span className={styles.mobileBottomTabIcon}>👗</span>
-            <span>Products</span>
-          </Link>
-
-          <Link
-            href="/admin/orders"
-            className={`${styles.mobileBottomTab} ${pathname === '/admin/orders' ? styles.mobileBottomTabActive : ''}`}
-          >
-            <span className={styles.mobileBottomTabIcon}>📦</span>
-            <span>Orders</span>
-          </Link>
-
-          <Link
-            href="/admin/settings"
-            className={`${styles.mobileBottomTab} ${pathname === '/admin/settings' ? styles.mobileBottomTabActive : ''}`}
-          >
-            <span className={styles.mobileBottomTabIcon}>⚙️</span>
-            <span>Settings</span>
-          </Link>
+            <span className={styles.roleBadge}>{user?.role || 'Admin'}</span>
+          </div>
 
           <button
             type="button"
-            className={styles.mobileBottomTab}
-            onClick={() => setMobileDrawerOpen(true)}
-            aria-label="Open full admin menu"
+            className={styles.drawerLogoutBtn}
+            onClick={() => {
+              setMobileDrawerOpen(false);
+              logout();
+            }}
           >
-            <span className={styles.mobileBottomTabIcon}>☰</span>
-            <span>Menu</span>
+            <span>🚪</span>
+            <span>Log Out of Console</span>
           </button>
-        </nav>
+        </div>
       </div>
+
+      {/* Desktop Sidebar (hidden on mobile via CSS) */}
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarHeader}>
+          <div className={styles.brandLogo}>
+            <span className={styles.logoDot} />
+            DOFIT WEARS
+          </div>
+          <span className={styles.brandBadgeAdmin}>ADMIN CONTROL</span>
+        </div>
+
+        <nav className={styles.nav}>
+          <span className={styles.navSectionLabel}>Core Operations</span>
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`${styles.navLink} ${isActive ? styles.navLinkActive : ''}`}
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className={styles.sidebarFooter}>
+          <Link href="/" className={styles.storeLink} target="_blank">
+            <span>🌐</span>
+            <span>View Public Storefront</span>
+          </Link>
+          <Link href="/asa" className={styles.storeLink} target="_blank">
+            <span>🎨</span>
+            <span>View Àṣà Couture</span>
+          </Link>
+
+          {/* Desktop Sidebar Profile & Logout */}
+          <div className={styles.sidebarProfile}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div className={styles.profileAvatar}>
+                {user?.name ? user.name[0].toUpperCase() : 'A'}
+              </div>
+              <div style={{ minWidth: 0, flex: 1 }}>
+                <div style={{ fontSize: '12.5px', fontWeight: 700, color: '#FFFFFF', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user?.name || 'Administrator'}
+                </div>
+                <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.45)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {user?.email || 'admin@dofit.fit'}
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              className={styles.sidebarLogoutBtn}
+              onClick={logout}
+              title="Sign Out of Admin Console"
+            >
+              <span>🚪 Sign Out</span>
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main content wrapper */}
+      <div className={styles.main}>
+        {/* Desktop Topbar */}
+        <header className={styles.topbar}>
+          <h1 className={styles.pageHeaderTitle}>
+            {currentNav?.label || 'Management Console'}
+          </h1>
+          <div className={styles.topbarActions}>
+            <div className={styles.statusPill}>
+              <span className={styles.statusPulse} />
+              <span>WhatsApp Router: +2349016946854</span>
+            </div>
+          </div>
+        </header>
+
+        {/* View content */}
+        <main className={styles.contentView}>{children}</main>
+      </div>
+
+      {/* Mobile Bottom Dock Navigation (Quick Thumb Switching) */}
+      <nav className={styles.mobileBottomNav} aria-label="Mobile Admin Navigation">
+        <Link
+          href="/admin"
+          className={`${styles.mobileBottomTab} ${pathname === '/admin' ? styles.mobileBottomTabActive : ''}`}
+        >
+          <span className={styles.mobileBottomTabIcon}>📊</span>
+          <span>Dashboard</span>
+        </Link>
+
+        <Link
+          href="/admin/products"
+          className={`${styles.mobileBottomTab} ${pathname === '/admin/products' ? styles.mobileBottomTabActive : ''}`}
+        >
+          <span className={styles.mobileBottomTabIcon}>👗</span>
+          <span>Products</span>
+        </Link>
+
+        <Link
+          href="/admin/orders"
+          className={`${styles.mobileBottomTab} ${pathname === '/admin/orders' ? styles.mobileBottomTabActive : ''}`}
+        >
+          <span className={styles.mobileBottomTabIcon}>📦</span>
+          <span>Orders</span>
+        </Link>
+
+        <Link
+          href="/admin/settings"
+          className={`${styles.mobileBottomTab} ${pathname === '/admin/settings' ? styles.mobileBottomTabActive : ''}`}
+        >
+          <span className={styles.mobileBottomTabIcon}>⚙️</span>
+          <span>Settings</span>
+        </Link>
+
+        <button
+          type="button"
+          className={styles.mobileBottomTab}
+          onClick={() => setMobileDrawerOpen(true)}
+          aria-label="Open full admin menu"
+        >
+          <span className={styles.mobileBottomTabIcon}>☰</span>
+          <span>Menu</span>
+        </button>
+      </nav>
+    </div>
+  );
+}
+
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <AdminAuthGate>
+      <AdminLayoutInner>{children}</AdminLayoutInner>
     </AdminAuthGate>
   );
 }

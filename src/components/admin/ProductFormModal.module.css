@@ -458,7 +458,8 @@
   .input,
   .select,
   .textarea {
-    font-size: 16px !important; /* Prevents iOS auto-zoom */
+    font-size: 16px !important;
+    /* Prevents iOS auto-zoom */
     min-height: 46px;
   }
 
@@ -497,4 +498,3 @@
     justify-content: center;
   }
 }
-

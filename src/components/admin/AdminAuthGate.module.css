@@ -178,3 +178,9 @@
   color: #EF4444;
 }
 
+@media (max-width: 900px) {
+  .logoutBtn {
+    display: none;
+  }
+}
+
