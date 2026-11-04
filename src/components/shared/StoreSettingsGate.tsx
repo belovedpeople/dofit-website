@@ -257,3 +257,4 @@ export default function StoreSettingsGate({ children }: { children: React.ReactN
     </>
   );
 }
+

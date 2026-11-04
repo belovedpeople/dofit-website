@@ -96,88 +96,146 @@ export default function AdminDashboard() {
           </Link>
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
-          <table className={styles.dataTable}>
-            <thead>
-              <tr>
-                <th>Order Ref</th>
-                <th>Customer</th>
-                <th>Phone</th>
-                <th>Brand</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.slice(0, 5).map((ord) => {
-                const cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
-                const waLink = `https://wa.me/${cleanPhone.startsWith('234') ? cleanPhone : '234' + cleanPhone.replace(/^0/, '')}`;
-                return (
-                  <tr key={ord.id}>
-                    <td>
-                      <strong style={{ color: 'var(--pink)' }}>#{ord.id}</strong>
-                      <div style={{ fontSize: '11px', opacity: 0.5 }}>
-                        {new Date(ord.createdAt).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td>
-                      <strong>{ord.customer.fullName}</strong>
-                      <div style={{ fontSize: '11px', opacity: 0.5 }}>
-                        {ord.customer.city}, {ord.customer.state}
-                      </div>
-                    </td>
-                    <td>{ord.customer.phone}</td>
-                    <td>
-                      {ord.brand === 'asa' ? (
-                        <span className={styles.brandBadgeAsa}>Àṣà</span>
-                      ) : ord.brand === 'dofit' ? (
-                        <span className={styles.brandBadgeDofit}>Dofit</span>
-                      ) : (
-                        <span className={styles.brandBadgeDofit}>Mixed</span>
-                      )}
-                    </td>
-                    <td>
-                      {ord.items.map((it) => (
-                        <div key={it.productId} style={{ fontSize: '12px' }}>
-                          {it.quantity}x {it.name} ({it.size})
+        {/* Desktop Table View */}
+        <div className={styles.desktopTableWrap}>
+          <div style={{ overflowX: 'auto' }}>
+            <table className={styles.dataTable}>
+              <thead>
+                <tr>
+                  <th>Order Ref</th>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Brand</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.slice(0, 5).map((ord) => {
+                  const cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
+                  const waLink = `https://wa.me/${cleanPhone.startsWith('234') ? cleanPhone : '234' + cleanPhone.replace(/^0/, '')}`;
+                  return (
+                    <tr key={ord.id}>
+                      <td>
+                        <strong style={{ color: 'var(--pink)' }}>#{ord.id}</strong>
+                        <div style={{ fontSize: '11px', opacity: 0.5 }}>
+                          {new Date(ord.createdAt).toLocaleDateString()}
                         </div>
-                      ))}
-                    </td>
-                    <td>
-                      <strong>₦{ord.totalAmount.toLocaleString()}</strong>
-                    </td>
-                    <td>
-                      <span
-                        className={`${styles.statusTag} ${ord.status === 'Pending'
-                            ? styles.statusPending
-                            : ord.status === 'Processing'
-                              ? styles.statusProcessing
-                              : ord.status === 'Dispatched'
-                                ? styles.statusDispatched
-                                : styles.statusDelivered
-                          }`}
-                      >
-                        ● {ord.status}
-                      </span>
-                    </td>
-                    <td>
-                      <a
-                        href={waLink}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`${styles.actionBtn} ${styles.actionBtnWa}`}
-                        title="Chat with Customer on WhatsApp"
-                      >
-                        💬 Chat
-                      </a>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                      </td>
+                      <td>
+                        <strong>{ord.customer.fullName}</strong>
+                        <div style={{ fontSize: '11px', opacity: 0.5 }}>
+                          {ord.customer.city}, {ord.customer.state}
+                        </div>
+                      </td>
+                      <td>{ord.customer.phone}</td>
+                      <td>
+                        {ord.brand === 'asa' ? (
+                          <span className={styles.brandBadgeAsa}>Àṣà</span>
+                        ) : ord.brand === 'dofit' ? (
+                          <span className={styles.brandBadgeDofit}>Dofit</span>
+                        ) : (
+                          <span className={styles.brandBadgeDofit}>Mixed</span>
+                        )}
+                      </td>
+                      <td>
+                        {ord.items.map((it) => (
+                          <div key={it.productId} style={{ fontSize: '12px' }}>
+                            {it.quantity}x {it.name} ({it.size})
+                          </div>
+                        ))}
+                      </td>
+                      <td>
+                        <strong>₦{ord.totalAmount.toLocaleString()}</strong>
+                      </td>
+                      <td>
+                        <span
+                          className={`${styles.statusTag} ${ord.status === 'Pending'
+                              ? styles.statusPending
+                              : ord.status === 'Processing'
+                                ? styles.statusProcessing
+                                : ord.status === 'Dispatched'
+                                  ? styles.statusDispatched
+                                  : styles.statusDelivered
+                            }`}
+                        >
+                          ● {ord.status}
+                        </span>
+                      </td>
+                      <td>
+                        <a
+                          href={waLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={`${styles.actionBtn} ${styles.actionBtnWa}`}
+                          title="Chat with Customer on WhatsApp"
+                        >
+                          💬 Chat
+                        </a>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Mobile Recent Orders Cards */}
+        <div className={styles.mobileCardList}>
+          {orders.slice(0, 4).map((ord) => {
+            const cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
+            const waLink = `https://wa.me/${cleanPhone.startsWith('234') ? cleanPhone : '234' + cleanPhone.replace(/^0/, '')}`;
+            return (
+              <div key={ord.id} className={styles.mobileOrderCard}>
+                <div className={styles.mobileOrderHeader}>
+                  <div>
+                    <div className={styles.mobileOrderRef}>#{ord.id}</div>
+                    <div className={styles.mobileOrderDate}>
+                      {new Date(ord.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
+                  <span
+                    className={`${styles.statusTag} ${
+                      ord.status === 'Pending'
+                        ? styles.statusPending
+                        : ord.status === 'Processing'
+                          ? styles.statusProcessing
+                          : ord.status === 'Dispatched'
+                            ? styles.statusDispatched
+                            : styles.statusDelivered
+                    }`}
+                  >
+                    ● {ord.status}
+                  </span>
+                </div>
+
+                <div className={styles.mobileCustomerRow}>
+                  <div>
+                    <div className={styles.mobileCustomerName}>{ord.customer.fullName}</div>
+                    <div className={styles.mobileCustomerPhone}>{ord.customer.phone}</div>
+                  </div>
+                  <a
+                    href={waLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className={styles.mobileWaBtn}
+                  >
+                    💬 Chat
+                  </a>
+                </div>
+
+                <div className={styles.mobileOrderFooter}>
+                  <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>
+                    {ord.items.reduce((s, i) => s + i.quantity, 0)} items ordered
+                  </div>
+                  <div className={styles.mobileOrderTotal}>₦{ord.totalAmount.toLocaleString()}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 

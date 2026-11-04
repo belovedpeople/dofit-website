@@ -372,7 +372,7 @@ export default function ProductFormModal({ open, product, onClose, onSaved }: Pr
                           <input
                             type="number"
                             className={styles.input}
-                            style={{ padding: '4px 6px', fontSize: '12px', height: '28px' }}
+                            style={{ padding: '6px 8px', fontSize: '14px', height: '36px' }}
                             placeholder={`${form.price || 0}`}
                             value={form.sizePrices?.[size] ?? ''}
                             onChange={(e) => {

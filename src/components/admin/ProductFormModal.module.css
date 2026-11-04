@@ -428,8 +428,73 @@
   cursor: not-allowed;
 }
 
-@media (max-width: 600px) {
-  .formGrid { grid-template-columns: 1fr; }
-  .modal { max-height: 95vh; }
+@media (max-width: 680px) {
+  .overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    max-height: 94vh;
+    border-radius: 20px 20px 0 0;
+    margin-top: auto;
+  }
+
+  .modalHeader {
+    padding: 18px 20px 14px;
+  }
+
+  .modalBody {
+    padding: 16px 18px;
+  }
+
+  .formGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .input,
+  .select,
+  .textarea {
+    font-size: 16px !important; /* Prevents iOS auto-zoom */
+    min-height: 46px;
+  }
+
+  .sizeBtn {
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+
+  .modalFooter {
+    position: sticky;
+    bottom: 0;
+    background: #12121A;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 20;
+    padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
+  }
+
+  .footerActions {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .cancelBtn,
+  .saveBtn {
+    min-height: 46px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 }
 

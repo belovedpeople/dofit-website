@@ -116,128 +116,238 @@ export default function AdminOrdersPage() {
 
       {/* Orders Table */}
       <div className={styles.tableCard}>
-        <div style={{ overflowX: 'auto' }}>
-          <table className={styles.dataTable}>
-            <thead>
-              <tr>
-                <th>Order Ref</th>
-                <th>Date</th>
-                <th>Customer Name</th>
-                <th>Phone</th>
-                <th>Delivery Address</th>
-                <th>Brand</th>
-                <th>Items Ordered</th>
-                <th>Total (₦)</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.length === 0 ? (
+        {/* Desktop Table View */}
+        <div className={styles.desktopTableWrap}>
+          <div style={{ overflowX: 'auto' }}>
+            <table className={styles.dataTable}>
+              <thead>
                 <tr>
-                  <td colSpan={10} style={{ textAlign: 'center', padding: '40px' }}>
-                    No orders match the selected filter criteria.
-                  </td>
+                  <th>Order Ref</th>
+                  <th>Date</th>
+                  <th>Customer Name</th>
+                  <th>Phone</th>
+                  <th>Delivery Address</th>
+                  <th>Brand</th>
+                  <th>Items Ordered</th>
+                  <th>Total (₦)</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ) : (
-                filteredOrders.map((ord) => {
-                  const cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
-                  const waCustomerLink = `https://wa.me/${
-                    cleanPhone.startsWith('234') ? cleanPhone : '234' + cleanPhone.replace(/^0/, '')
-                  }`;
+              </thead>
+              <tbody>
+                {filteredOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan={10} style={{ textAlign: 'center', padding: '40px' }}>
+                      No orders match the selected filter criteria.
+                    </td>
+                  </tr>
+                ) : (
+                  filteredOrders.map((ord) => {
+                    const cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
+                    const waCustomerLink = `https://wa.me/${
+                      cleanPhone.startsWith('234') ? cleanPhone : '234' + cleanPhone.replace(/^0/, '')
+                    }`;
 
-                  return (
-                    <tr key={ord.id}>
-                      <td>
-                        <strong style={{ color: 'var(--pink)' }}>#{ord.id}</strong>
-                      </td>
-                      <td style={{ fontSize: '12px', opacity: 0.6 }}>
+                    return (
+                      <tr key={ord.id}>
+                        <td>
+                          <strong style={{ color: 'var(--pink)' }}>#{ord.id}</strong>
+                        </td>
+                        <td style={{ fontSize: '12px', opacity: 0.6 }}>
+                          {new Date(ord.createdAt).toLocaleString([], {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </td>
+                        <td>
+                          <strong>{ord.customer.fullName}</strong>
+                        </td>
+                        <td>
+                          <a
+                            href={waCustomerLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{ color: '#25D366', textDecoration: 'none' }}
+                            title="Open WhatsApp chat with customer"
+                          >
+                            {ord.customer.phone} 💬
+                          </a>
+                        </td>
+                        <td style={{ maxWidth: '200px' }}>
+                          <div style={{ fontSize: '12.5px', lineHeight: 1.3 }}>
+                            {ord.customer.address}
+                            <div style={{ opacity: 0.5, fontSize: '11px' }}>
+                              {ord.customer.city}, {ord.customer.state}
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          {ord.brand === 'asa' ? (
+                            <span className={styles.brandBadgeAsa}>Àṣà</span>
+                          ) : ord.brand === 'dofit' ? (
+                            <span className={styles.brandBadgeDofit}>Dofit</span>
+                          ) : (
+                            <span className={styles.brandBadgeDofit}>Mixed</span>
+                          )}
+                        </td>
+                        <td>
+                          {ord.items.map((it, idx) => (
+                            <div key={idx} style={{ fontSize: '12px' }}>
+                              • {it.quantity}x {it.name} ({it.size})
+                            </div>
+                          ))}
+                        </td>
+                        <td>
+                          <strong>₦{ord.totalAmount.toLocaleString()}</strong>
+                        </td>
+                        <td>
+                          <select
+                            value={ord.status}
+                            onChange={(e) =>
+                              handleStatusChange(ord.id, e.target.value as Order['status'])
+                            }
+                            style={{
+                              background: '#1A1A24',
+                              border: '1px solid rgba(255,255,255,0.15)',
+                              color: '#FFFFFF',
+                              borderRadius: '6px',
+                              padding: '6px 8px',
+                              fontSize: '12px',
+                              outline: 'none',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <option value="Pending">Pending</option>
+                            <option value="Processing">Processing</option>
+                            <option value="Dispatched">Dispatched</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                          </select>
+                        </td>
+                        <td>
+                          <button
+                            onClick={() => setSelectedOrder(ord)}
+                            className={styles.actionBtn}
+                          >
+                            Inspect
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Mobile Order Cards View */}
+        <div className={styles.mobileCardList}>
+          {filteredOrders.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px 20px', color: 'rgba(255,255,255,0.4)', fontSize: '14px' }}>
+              No orders match the selected filter criteria.
+            </div>
+          ) : (
+            filteredOrders.map((ord) => {
+              const cleanPhone = ord.customer.phone.replace(/[^0-9]/g, '');
+              const waCustomerLink = `https://wa.me/${
+                cleanPhone.startsWith('234') ? cleanPhone : '234' + cleanPhone.replace(/^0/, '')
+              }`;
+
+              return (
+                <div key={ord.id} className={styles.mobileOrderCard}>
+                  <div className={styles.mobileOrderHeader}>
+                    <div>
+                      <div className={styles.mobileOrderRef}>#{ord.id}</div>
+                      <div className={styles.mobileOrderDate}>
                         {new Date(ord.createdAt).toLocaleString([], {
                           month: 'short',
                           day: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
-                      </td>
-                      <td>
-                        <strong>{ord.customer.fullName}</strong>
-                      </td>
-                      <td>
-                        <a
-                          href={waCustomerLink}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{ color: '#25D366', textDecoration: 'none' }}
-                          title="Open WhatsApp chat with customer"
-                        >
-                          {ord.customer.phone} 💬
-                        </a>
-                      </td>
-                      <td style={{ maxWidth: '200px' }}>
-                        <div style={{ fontSize: '12.5px', lineHeight: 1.3 }}>
-                          {ord.customer.address}
-                          <div style={{ opacity: 0.5, fontSize: '11px' }}>
-                            {ord.customer.city}, {ord.customer.state}
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        {ord.brand === 'asa' ? (
-                          <span className={styles.brandBadgeAsa}>Àṣà</span>
-                        ) : ord.brand === 'dofit' ? (
-                          <span className={styles.brandBadgeDofit}>Dofit</span>
-                        ) : (
-                          <span className={styles.brandBadgeDofit}>Mixed</span>
-                        )}
-                      </td>
-                      <td>
-                        {ord.items.map((it, idx) => (
-                          <div key={idx} style={{ fontSize: '12px' }}>
-                            • {it.quantity}x {it.name} ({it.size})
-                          </div>
-                        ))}
-                      </td>
-                      <td>
-                        <strong>₦{ord.totalAmount.toLocaleString()}</strong>
-                      </td>
-                      <td>
-                        <select
-                          value={ord.status}
-                          onChange={(e) =>
-                            handleStatusChange(ord.id, e.target.value as Order['status'])
-                          }
-                          style={{
-                            background: '#1A1A24',
-                            border: '1px solid rgba(255,255,255,0.15)',
-                            color: '#FFFFFF',
-                            borderRadius: '6px',
-                            padding: '6px 8px',
-                            fontSize: '12px',
-                            outline: 'none',
-                            cursor: 'pointer',
-                          }}
-                        >
-                          <option value="Pending">Pending</option>
-                          <option value="Processing">Processing</option>
-                          <option value="Dispatched">Dispatched</option>
-                          <option value="Delivered">Delivered</option>
-                          <option value="Cancelled">Cancelled</option>
-                        </select>
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => setSelectedOrder(ord)}
-                          className={styles.actionBtn}
-                        >
-                          Inspect
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                      </div>
+                    </div>
+                    <div>
+                      {ord.brand === 'asa' ? (
+                        <span className={styles.brandBadgeAsa}>Àṣà</span>
+                      ) : ord.brand === 'dofit' ? (
+                        <span className={styles.brandBadgeDofit}>Dofit</span>
+                      ) : (
+                        <span className={styles.brandBadgeDofit}>Mixed</span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Customer & Direct WhatsApp */}
+                  <div className={styles.mobileCustomerRow}>
+                    <div>
+                      <div className={styles.mobileCustomerName}>{ord.customer.fullName}</div>
+                      <div className={styles.mobileCustomerPhone}>{ord.customer.phone}</div>
+                    </div>
+                    <a
+                      href={waCustomerLink}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles.mobileWaBtn}
+                      title="Chat customer on WhatsApp"
+                    >
+                      💬 Chat
+                    </a>
+                  </div>
+
+                  {/* Items Summary */}
+                  <div style={{ background: 'rgba(255,255,255,0.02)', padding: '10px 12px', borderRadius: '8px', fontSize: '12px' }}>
+                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Items ({ord.items.reduce((s, i) => s + i.quantity, 0)})
+                    </div>
+                    {ord.items.map((it, idx) => (
+                      <div key={idx} style={{ color: 'rgba(255,255,255,0.85)', padding: '2px 0' }}>
+                        • <strong>{it.quantity}x</strong> {it.name} <span style={{ color: 'var(--pink)' }}>({it.size})</span>
+                      </div>
+                    ))}
+                    <div style={{ fontSize: '11.5px', color: 'rgba(255,255,255,0.5)', marginTop: '6px', paddingTop: '6px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                      📍 {ord.customer.address}, {ord.customer.city}
+                    </div>
+                  </div>
+
+                  {/* Footer with Total and Status Dropdown */}
+                  <div className={styles.mobileOrderFooter}>
+                    <div>
+                      <div style={{ fontSize: '10.5px', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' }}>Total</div>
+                      <div className={styles.mobileOrderTotal}>₦{ord.totalAmount.toLocaleString()}</div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <select
+                        value={ord.status}
+                        onChange={(e) => handleStatusChange(ord.id, e.target.value as Order['status'])}
+                        className={styles.mobileStatusSelect}
+                        aria-label="Update order status"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Processing">Processing</option>
+                        <option value="Dispatched">Dispatched</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={() => setSelectedOrder(ord)}
+                        className={styles.actionBtn}
+                        style={{ minHeight: '40px', padding: '0 12px', fontSize: '12px' }}
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
         </div>
       </div>
 
@@ -247,13 +357,13 @@ export default function AdminOrdersPage() {
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0,0,0,0.8)',
+            background: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(10px)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 1000,
-            padding: '20px',
+            padding: '14px',
           }}
           onClick={() => setSelectedOrder(null)}
         >
@@ -264,7 +374,9 @@ export default function AdminOrdersPage() {
               borderRadius: '20px',
               width: '100%',
               maxWidth: '560px',
-              padding: '28px',
+              maxHeight: '92vh',
+              overflowY: 'auto',
+              padding: '24px 20px',
               position: 'relative',
               boxShadow: '0 25px 60px rgba(0,0,0,0.8)',
             }}

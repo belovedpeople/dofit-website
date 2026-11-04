@@ -36,3 +36,4 @@ export function updateSettings(newSettings: Partial<SiteSettings>, by?: string):
   };
   return siteSettingsStore;
 }
+
