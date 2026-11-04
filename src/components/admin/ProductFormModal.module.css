@@ -1,9 +1,10 @@
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
-  z-index: 1000;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 3000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -432,14 +433,17 @@
   .overlay {
     padding: 0;
     align-items: flex-end;
+    z-index: 3000;
   }
 
   .modal {
     width: 100%;
     max-width: 100%;
-    max-height: 94vh;
+    max-height: 92vh;
     border-radius: 20px 20px 0 0;
     margin-top: auto;
+    position: relative;
+    z-index: 3001;
   }
 
   .modalHeader {
@@ -448,6 +452,7 @@
 
   .modalBody {
     padding: 16px 18px;
+    padding-bottom: 24px;
   }
 
   .formGrid {
@@ -476,23 +481,24 @@
     position: sticky;
     bottom: 0;
     background: #12121A;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 20;
-    padding: 12px 18px calc(14px + env(safe-area-inset-bottom, 0px));
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.7);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    z-index: 3002;
+    padding: 14px 18px calc(18px + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.9);
   }
 
   .footerActions {
     display: grid;
     grid-template-columns: 1fr 1.5fr;
-    gap: 10px;
+    gap: 12px;
     width: 100%;
   }
 
   .cancelBtn,
   .saveBtn {
-    min-height: 46px;
+    min-height: 48px;
     font-size: 14px;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;

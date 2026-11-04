@@ -80,3 +80,4 @@ export async function compressImageIfNeeded(file: File, maxDimension = 2048, qua
     reader.readAsDataURL(file);
   });
 }
+

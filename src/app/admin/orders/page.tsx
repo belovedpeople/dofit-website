@@ -451,7 +451,7 @@ export default function AdminOrdersPage() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000,
+            zIndex: 3000,
             padding: '14px',
           }}
           onClick={() => setSelectedOrder(null)}
@@ -664,7 +664,7 @@ export default function AdminOrdersPage() {
             inset: 0,
             background: 'rgba(0,0,0,0.85)',
             backdropFilter: 'blur(8px)',
-            zIndex: 2000,
+            zIndex: 3000,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
