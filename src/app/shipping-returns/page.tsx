@@ -27,7 +27,7 @@ export default function ShippingReturnsPage() {
             <div className={styles.section}>
               <h2 className={styles.sectionTitle}>⚡ 1. Delivery Rates &amp; Timelines</h2>
               <p className={styles.paragraph}>
-                We maintain active fulfillment hubs in Lagos to ensure rapid, dependable door-to-door dispatch. Every package is carefully inspected, packed in branded matte presentation boxes, and tracked until it safely reaches your hands. Delivery fees are quoted upon inquiry based on your destination and parcel size, with an estimated delivery time of 3 – 7 business days for all orders.
+                We maintain active fulfillment hubs in Lagos to ensure rapid, dependable door-to-door dispatch. Every package is carefully inspected, packed in branded matte presentation boxes, and tracked until it safely reaches your hands. Delivery fees are quoted on delivery based on your destination and parcel size, with an estimated delivery time of 2 – 3 business days for all orders.
               </p>
 
               <div className={styles.tableWrap}>
@@ -46,10 +46,10 @@ export default function ShippingReturnsPage() {
                         <strong>Lagos (Island &amp; Mainland)</strong>
                       </td>
                       <td>
-                        <strong>Quoted on Inquiry</strong>
+                        <strong>Quoted on Delivery</strong>
                       </td>
                       <td>
-                        <strong>3 – 7 Business Days</strong>
+                        <strong>2 – 3 Business Days</strong>
                       </td>
                       <td>Direct Motorcycle Dispatch</td>
                     </tr>
@@ -59,10 +59,10 @@ export default function ShippingReturnsPage() {
                         <div style={{ fontSize: '11px', opacity: 0.6 }}>Abuja, Port Harcourt, Ibadan, Asaba, Benin, etc.</div>
                       </td>
                       <td>
-                        <strong>Quoted on Inquiry</strong>
+                        <strong>Quoted on Delivery</strong>
                       </td>
                       <td>
-                        <strong>3 – 7 Business Days</strong>
+                        <strong>2 – 3 Business Days</strong>
                       </td>
                       <td>Verified Freight Logistics (GIGL / Speedaf)</td>
                     </tr>
@@ -71,10 +71,10 @@ export default function ShippingReturnsPage() {
                         <strong>Interstate (Outlying Areas)</strong>
                       </td>
                       <td>
-                        <strong>Quoted on Inquiry</strong>
+                        <strong>Quoted on Delivery</strong>
                       </td>
                       <td>
-                        <strong>3 – 7 Business Days</strong>
+                        <strong>2 – 3 Business Days</strong>
                       </td>
                       <td>Tracked Interstate Express</td>
                     </tr>
@@ -83,10 +83,10 @@ export default function ShippingReturnsPage() {
                         <strong>International (UK, US, Canada, EU, Ghana, Worldwide)</strong>
                       </td>
                       <td>
-                        <strong>Quoted on Inquiry</strong>
+                        <strong>Quoted on Delivery</strong>
                       </td>
                       <td>
-                        <strong>3 – 7 Business Days</strong>
+                        <strong>2 – 3 Business Days</strong>
                       </td>
                       <td>DHL Express / FedEx Priority</td>
                     </tr>

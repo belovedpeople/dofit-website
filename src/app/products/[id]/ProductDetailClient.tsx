@@ -555,10 +555,6 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
             {/* Trust Badges */}
             <div className={styles.trustStrip}>
               <div className={styles.trustItem}>
-                <span>⚡</span>
-                <span>Express Lagos Delivery (Same Day / 24 Hours)</span>
-              </div>
-              <div className={styles.trustItem}>
                 <span>🔄</span>
                 <span>Free 7-Day Size Exchanges</span>
               </div>
@@ -640,10 +636,10 @@ export default function ProductDetailClient({ initialProduct, slug }: ProductDet
                 {activeTab === 'shipping' && (
                   <div className={styles.shippingContent}>
                     <p>
-                      <strong>Lagos:</strong> ₦2,500 flat dispatch (Free over ₦50,000) · 12–24h.
+                      <strong>Delivery Fee:</strong> Quoted on delivery.
                     </p>
                     <p>
-                      <strong>Interstate (Abuja, PH, Ibadan, etc.):</strong> ₦5,000 · 2–3 business days via verified logistics.
+                      <strong>Estimated Time:</strong> 2 – 3 business days for all orders.
                     </p>
                     <p>
                       <strong>International:</strong> DHL Express available on WhatsApp inquiry.
