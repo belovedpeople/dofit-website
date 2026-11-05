@@ -11,6 +11,14 @@ export interface ShowcaseContent {
     alt: string;
     link?: string;
   }>;
+  asaTeaser?: {
+    backgroundImage: string;
+    looks: Array<{
+      id: string;
+      title: string;
+      image: string;
+    }>;
+  };
   asaHero: {
     mainImage: string;
   };
@@ -58,6 +66,14 @@ export const defaultShowcaseContent: ShowcaseContent = {
     { id: 'ig-5', src: '/images/dofit-wears/Long-Sleeve Tennis Skirt Set.png', alt: 'Tennis Set' },
     { id: 'ig-6', src: '/images/asa/image5.png', alt: 'Àṣà 5' },
   ],
+  asaTeaser: {
+    backgroundImage: '/images/asa/image3.png',
+    looks: [
+      { id: 'teaser-1', title: 'Look 01', image: '/images/asa/image1.png' },
+      { id: 'teaser-2', title: 'Look 02', image: '/images/asa/image2.png' },
+      { id: 'teaser-3', title: 'Look 04', image: '/images/asa/image4.png' },
+    ],
+  },
   asaHero: {
     mainImage: '/images/asa/image3.png',
   },

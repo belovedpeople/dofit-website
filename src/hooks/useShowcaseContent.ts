@@ -18,6 +18,7 @@ if (typeof window !== 'undefined') {
           dofitHero: { ...defaultShowcaseContent.dofitHero, ...parsed.dofitHero },
           asaHero: { ...defaultShowcaseContent.asaHero, ...parsed.asaHero },
           asaStory: { ...defaultShowcaseContent.asaStory, ...parsed.asaStory },
+          asaTeaser: { ...defaultShowcaseContent.asaTeaser, ...parsed.asaTeaser },
         };
       }
     }

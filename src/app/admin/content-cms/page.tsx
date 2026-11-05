@@ -347,6 +347,121 @@ export default function AdminContentCmsPage() {
               ))}
             </div>
           </div>
+
+          {/* 3. Àṣà by Dofit Teaser (Home Landing Page Section) */}
+          <div className={styles.tableCard} style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <h3 style={{ fontSize: '16px', color: '#fff', marginBottom: '4px' }}>3. Àṣà by Dofit Teaser (On Home Landing Page)</h3>
+                <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.4)' }}>
+                  Controls the background photo and 3 floating preview cards (Look 01, Look 02, Look 04) displayed on the home page.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (showcase.asaGallery && showcase.asaGallery.length >= 3) {
+                    const synced = {
+                      ...showcase,
+                      asaTeaser: {
+                        backgroundImage: showcase.asaHero?.mainImage || '/images/asa/image3.png',
+                        looks: showcase.asaGallery.slice(0, 3).map((g, i) => ({
+                          id: `teaser-${i + 1}`,
+                          title: `Look 0${i === 2 ? 4 : i + 1}`,
+                          image: g.image,
+                        })),
+                      },
+                    };
+                    setShowcase(synced);
+                    saveShowcaseData(synced, 'Àṣà Teaser synced from Gallery');
+                  } else {
+                    alert('Please upload at least 3 looks in the Àṣà tab first.');
+                  }
+                }}
+                className={styles.actionBtn}
+                style={{ fontSize: '11.5px', padding: '6px 12px' }}
+              >
+                ⚡ Sync from Àṣà Gallery
+              </button>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px', marginTop: '16px' }}>
+              {/* Teaser Background */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '16px' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--asa-gold)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  Teaser Section Background Image
+                </span>
+                <div style={{ position: 'relative', width: '100%', height: '180px', borderRadius: '8px', overflow: 'hidden', margin: '12px 0', background: '#111' }}>
+                  <Image
+                    src={showcase.asaTeaser?.backgroundImage || showcase.asaHero?.mainImage || '/images/asa/image3.png'}
+                    alt="Teaser Background"
+                    fill
+                    style={{ objectFit: 'cover' }}
+                    unoptimized
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    triggerImageUpload(
+                      (url, prev) => {
+                        const curTeaser = prev.asaTeaser || defaultShowcaseContent.asaTeaser!;
+                        return {
+                          ...prev,
+                          asaTeaser: { ...curTeaser, backgroundImage: url },
+                        };
+                      },
+                      'Àṣà Teaser Background'
+                    )
+                  }
+                  className={styles.actionBtn}
+                  style={{ width: '100%', justifyContent: 'center' }}
+                >
+                  📸 Change Teaser Background
+                </button>
+              </div>
+
+              {/* 3 Floating Looks */}
+              <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '16px', gridColumn: 'span 2' }}>
+                <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--asa-gold)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+                  3 Floating Looks (Look 01, Look 02, Look 04)
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', margin: '12px 0' }}>
+                  {(showcase.asaTeaser?.looks || defaultShowcaseContent.asaTeaser!.looks).slice(0, 3).map((look, idx) => (
+                    <div key={look.id || idx} style={{ textAlign: 'center' }}>
+                      <div style={{ position: 'relative', width: '100%', aspectRatio: '3/4', borderRadius: '8px', overflow: 'hidden', background: '#111', marginBottom: '8px' }}>
+                        <Image src={look.image} alt={look.title} fill style={{ objectFit: 'cover' }} unoptimized />
+                        <span style={{ position: 'absolute', bottom: '6px', left: '6px', background: 'rgba(0,0,0,0.7)', color: '#fff', fontSize: '9.5px', padding: '2px 6px', borderRadius: '3px' }}>
+                          {look.title}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          triggerImageUpload(
+                            (url, prev) => {
+                              const curTeaser = prev.asaTeaser || defaultShowcaseContent.asaTeaser!;
+                              const curLooks = [...curTeaser.looks];
+                              curLooks[idx] = { ...curLooks[idx], image: url };
+                              return {
+                                ...prev,
+                                asaTeaser: { ...curTeaser, looks: curLooks },
+                              };
+                            },
+                            `${look.title} Image`
+                          )
+                        }
+                        className={styles.actionBtn}
+                        style={{ fontSize: '11px', width: '100%', padding: '6px 8px', justifyContent: 'center' }}
+                      >
+                        Change {look.title}
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

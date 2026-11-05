@@ -152,6 +152,7 @@ export async function POST(request: NextRequest) {
       dofitHero: { ...current.dofitHero, ...(body.dofitHero || {}) },
       asaHero: { ...current.asaHero, ...(body.asaHero || {}) },
       asaStory: { ...current.asaStory, ...(body.asaStory || {}) },
+      asaTeaser: body.asaTeaser ? { ...(current.asaTeaser || defaultShowcaseContent.asaTeaser), ...body.asaTeaser } : current.asaTeaser,
       dofitInsta: body.dofitInsta ?? current.dofitInsta,
       asaGallery: body.asaGallery ?? current.asaGallery,
       socialLinks: { ...current.socialLinks, ...(body.socialLinks || {}) },
