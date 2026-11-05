@@ -97,6 +97,7 @@ export default function AsaGallery() {
                   fill
                   className={styles.img}
                   sizes="(max-width: 768px) 100vw, 33vw"
+                  unoptimized={Boolean(item.image?.startsWith('http'))}
                 />
                 <div className={styles.imgOverlay} />
                 <span className={`${styles.badge} asa-body`}>{item.category}</span>

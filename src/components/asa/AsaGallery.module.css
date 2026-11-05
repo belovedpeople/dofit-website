@@ -17,9 +17,58 @@
 }
 
 .header {
-  text-align: center;
+  text-align: left;
   max-width: 800px;
-  margin: 0 auto 64px;
+  margin: 0 auto 48px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.headerLeft {
+  flex: 0 0 auto;
+}
+
+.headerDesc {
+  flex: 1 1 280px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--asa-cream-70);
+  align-self: flex-end;
+  padding-bottom: 4px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--asa-gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.goldText {
+  font-style: italic;
+  color: var(--asa-gold);
+  text-shadow: 0 0 25px rgba(232, 160, 32, 0.35);
+}
+
+/* Active filter state — used via filterBtnActive */
+.filterBtnActive {
+  background: var(--asa-gold);
+  color: var(--asa-void);
+  border-color: var(--asa-gold);
+  font-weight: 700;
+  box-shadow: 0 0 15px rgba(232, 160, 32, 0.3);
+}
+
+@media (max-width: 640px) {
+  .header {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
 }
 
 .badge {
@@ -108,6 +157,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 32px;
+  margin-top: 48px;
   margin-bottom: 80px;
 }
 
@@ -125,23 +175,50 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(232, 160, 32, 0.15);
 }
 
-.imageContainer {
+/* Image wrapper — tall portrait ratio for fashion photography */
+.imgWrap {
   position: relative;
-  height: 440px;
   width: 100%;
+  aspect-ratio: 3 / 4;   /* Portrait ratio — shows full figure without squishing */
   overflow: hidden;
-  background: #000;
+  background: #0a0a14;
 }
 
-.image {
+/* Alias for imageContainer (legacy) */
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #0a0a14;
+}
+
+.img {
   object-fit: cover;
+  object-position: center top;  /* Anchors to top so face/upper body is never cropped */
   transition: transform 0.7s var(--ease-out);
 }
 
-.card:hover .image {
-  transform: scale(1.08);
+/* Alias for image (legacy) */
+.image {
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.7s var(--ease-out);
 }
 
+.card:hover .img,
+.card:hover .image {
+  transform: scale(1.06);
+}
+
+.imgOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 50%, rgba(13, 11, 31, 0.8) 100%);
+  pointer-events: none;
+}
+
+/* Alias for overlay (legacy) */
 .overlay {
   position: absolute;
   inset: 0;
@@ -153,23 +230,25 @@
   transition: opacity 0.3s ease;
 }
 
-.cardQuote {
-  font-family: var(--font-asa-disp);
-  font-style: italic;
-  font-size: 19px;
-  line-height: 1.35;
-  color: #E8A020;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+/* Category badge overlaid on image */
+.badge {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(13, 11, 31, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(232, 160, 32, 0.35);
+  color: var(--asa-gold);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: 999px;
+  text-transform: uppercase;
 }
 
-.cardQuoteSub {
-  font-family: var(--font-asa-body);
-  font-size: 11.5px;
-  color: rgba(242, 232, 213, 0.75);
-  margin-top: 4px;
-  font-style: normal;
-}
-
+/* Alias for cardCategory (legacy) */
 .cardCategory {
   position: absolute;
   top: 16px;
@@ -187,20 +266,46 @@
   text-transform: uppercase;
 }
 
+.cardInfo {
+  padding: 20px 22px 24px;
+}
+
+/* Alias for cardDetails (legacy) */
 .cardDetails {
   padding: 24px;
 }
 
 .cardTitle {
-  font-size: 24px;
+  font-size: clamp(18px, 2.2vw, 24px);
   color: var(--asa-cream);
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  line-height: 1.25;
 }
 
 .cardTagline {
-  font-size: 13px;
+  font-size: 12.5px;
   line-height: 1.6;
   color: var(--asa-cream-70);
+  margin-bottom: 12px;
+}
+
+.cardQuote {
+  font-family: var(--font-asa-disp);
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #E8A020;
+  border-left: 2px solid rgba(232, 160, 32, 0.4);
+  padding-left: 10px;
+  margin: 0;
+}
+
+.cardQuoteSub {
+  font-family: var(--font-asa-body);
+  font-size: 11.5px;
+  color: rgba(242, 232, 213, 0.75);
+  margin-top: 4px;
+  font-style: normal;
 }
 
 /* Banner */
@@ -248,8 +353,17 @@
 @media (max-width: 640px) {
   .grid {
     grid-template-columns: 1fr;
+    gap: 24px;
   }
+  .imgWrap,
   .imageContainer {
-    height: 380px;
+    aspect-ratio: 4 / 5;  /* Slightly wider on mobile but still portrait */
+  }
+  .cardInfo,
+  .cardDetails {
+    padding: 16px 18px 20px;
+  }
+  .cardTitle {
+    font-size: 20px;
   }
 }

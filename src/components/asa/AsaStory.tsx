@@ -31,6 +31,7 @@ export default function AsaStory() {
                 fill
                 className={styles.img}
                 sizes="(max-width: 768px) 100vw, 44vw"
+                unoptimized={Boolean(story.mainImage?.startsWith('http'))}
               />
               <div className={styles.imgBorder} />
             </div>

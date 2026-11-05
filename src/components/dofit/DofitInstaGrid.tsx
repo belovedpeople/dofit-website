@@ -33,6 +33,7 @@ export default function DofitInstaGrid() {
               fill
               className={styles.cellImg}
               sizes="(max-width: 768px) 50vw, 17vw"
+              unoptimized={Boolean(img.src?.startsWith('http'))}
             />
             <div className={styles.cellOverlay}>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
